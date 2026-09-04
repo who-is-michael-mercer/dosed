@@ -1,0 +1,5 @@
+[
+  {"id":"category.stimulant","label":"Stimulants","description":"Substances that tend to increase alertness and physiological activity.","order":1,"color":"coral"},
+  {"id":"category.dissociative","label":"Dissociatives","description":"Substances that can alter sensory integration and connection to surroundings.","order":2,"color":"blue"},
+  {"id":"category.psychedelic","label":"Psychedelics","description":"Substances that can substantially alter perception, thought, and mood.","order":3,"color":"violet"}
+]

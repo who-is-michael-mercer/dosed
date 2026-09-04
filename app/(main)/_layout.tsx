@@ -1,0 +1,1 @@
+import {Stack} from 'expo-router';import {colors} from '../../src/design/tokens';export default function MainLayout(){return <Stack screenOptions={{headerStyle:{backgroundColor:colors.background},headerTintColor:colors.text}}><Stack.Screen name="library/index" options={{headerShown:false}}/><Stack.Screen name="library/search" options={{title:'Search'}}/></Stack>}
