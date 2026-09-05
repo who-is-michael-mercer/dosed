@@ -1,8 +1,13 @@
 {
   "expo": {
-    "name": "Dosed", "slug": "dosed", "version": "0.1.0", "scheme": "dosed",
-    "orientation": "default", "userInterfaceStyle": "dark",
-    "plugins": ["expo-router"], "experiments": { "typedRoutes": true },
+    "name": "Dosed",
+    "slug": "dosed",
+    "version": "0.1.0",
+    "scheme": "dosed",
+    "orientation": "default",
+    "userInterfaceStyle": "dark",
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true },
     "ios": { "supportsTablet": true, "bundleIdentifier": "app.dosed.reference" },
     "android": { "package": "app.dosed.reference" }
   }

@@ -1,4 +1,78 @@
-import {useLocalSearchParams} from 'expo-router';import * as Linking from 'expo-linking';import {ScrollView,StyleSheet,View} from 'react-native';import content from '../../generated/content.json';import {contentRepository} from '../../src/infrastructure/content/LocalContentRepository';import {stableIdSchema} from '../../src/domain/content';import {colors,spacing} from '../../src/design/tokens';import {Action,AppText,Heading,Surface} from '../../src/components/ui';
-const Band=({title,items,tone}:{title:string;items:string[];tone:'expected'|'attention'|'help'})=><Surface style={[styles.band,tone==='help'&&styles.help]} accessibilityLabel={`${title}. ${items.join(' ')}`}><Heading>{tone==='help'?'! ':''}{title}</Heading>{items.map(x=><AppText key={x}>• {x}</AppText>)}</Surface>;
-export default function Emergency(){const {substanceId}=useLocalSearchParams<{substanceId?:string}>();const parsed=stableIdSchema.safeParse(substanceId);const substance=parsed.success?contentRepository.getSubstance(parsed.data):undefined;return <ScrollView style={styles.page} contentContainerStyle={styles.content}><Heading style={styles.title}>Something feels wrong?</Heading><AppText>Act on what you can see. You do not need a confirmed substance or dose.</AppText><Action accessibilityLabel="Call emergency services using the device dialer" onPress={()=>void Linking.openURL('tel:112')}>Call emergency services</Action><AppText style={styles.fallback}>112 is the configured international fallback. If it is not your local number, use your local emergency number.</AppText><Band title="Expected" tone="expected" items={content.emergency.expected}/><Band title="Pay attention" tone="attention" items={content.emergency.payAttention}/><Band title="Get emergency help" tone="help" items={content.emergency.getHelp}/><Surface><Heading>Not sure what was taken?</Heading><AppText>{content.emergency.unknown}</AppText><AppText>Multiple substances or adulteration may be involved. Say that clearly to responders.</AppText></Surface>{substance?.id==='substance.mdma'&&<Surface><Heading>MDMA context</Heading><AppText>Very hot skin with confusion, collapse, seizure, chest pain, or breathing difficulty needs emergency help now. General guidance above remains primary.</AppText></Surface>}</ScrollView>}
-const styles=StyleSheet.create({page:{flex:1,backgroundColor:colors.background},content:{padding:spacing.lg,gap:spacing.lg},title:{fontSize:38,lineHeight:44},band:{gap:spacing.md},help:{borderWidth:3,borderColor:colors.emergency},fallback:{color:colors.muted}});
+import { useLocalSearchParams } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import content from '../../generated/content.json';
+import { contentRepository } from '../../src/infrastructure/content/LocalContentRepository';
+import { stableIdSchema } from '../../src/domain/content';
+import { colors, spacing } from '../../src/design/tokens';
+import { Action, AppText, Heading, Surface } from '../../src/components/ui';
+const Band = ({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: 'expected' | 'attention' | 'help';
+}) => (
+  <Surface
+    style={[styles.band, tone === 'help' && styles.help]}
+    accessibilityLabel={`${title}. ${items.join(' ')}`}
+  >
+    <Heading>
+      {tone === 'help' ? '! ' : ''}
+      {title}
+    </Heading>
+    {items.map((x) => (
+      <AppText key={x}>• {x}</AppText>
+    ))}
+  </Surface>
+);
+export default function Emergency() {
+  const { substanceId } = useLocalSearchParams<{ substanceId?: string }>();
+  const parsed = stableIdSchema.safeParse(substanceId);
+  const substance = parsed.success ? contentRepository.getSubstance(parsed.data) : undefined;
+  return (
+    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+      <Heading style={styles.title}>Something feels wrong?</Heading>
+      <AppText>Act on what you can see. You do not need a confirmed substance or dose.</AppText>
+      <Action
+        accessibilityLabel="Call emergency services using the device dialer"
+        onPress={() => void Linking.openURL('tel:112')}
+      >
+        Call emergency services
+      </Action>
+      <AppText style={styles.fallback}>
+        112 is the configured international fallback. If it is not your local number, use your local
+        emergency number.
+      </AppText>
+      <Band title="Expected" tone="expected" items={content.emergency.expected} />
+      <Band title="Pay attention" tone="attention" items={content.emergency.payAttention} />
+      <Band title="Get emergency help" tone="help" items={content.emergency.getHelp} />
+      <Surface>
+        <Heading>Not sure what was taken?</Heading>
+        <AppText>{content.emergency.unknown}</AppText>
+        <AppText>
+          Multiple substances or adulteration may be involved. Say that clearly to responders.
+        </AppText>
+      </Surface>
+      {substance?.id === 'substance.mdma' && (
+        <Surface>
+          <Heading>MDMA context</Heading>
+          <AppText>
+            Very hot skin with confusion, collapse, seizure, chest pain, or breathing difficulty
+            needs emergency help now. General guidance above remains primary.
+          </AppText>
+        </Surface>
+      )}
+    </ScrollView>
+  );
+}
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.lg, gap: spacing.lg },
+  title: { fontSize: 38, lineHeight: 44 },
+  band: { gap: spacing.md },
+  help: { borderWidth: 3, borderColor: colors.emergency },
+  fallback: { color: colors.muted },
+});

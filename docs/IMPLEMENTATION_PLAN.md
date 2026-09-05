@@ -14,17 +14,17 @@ Content correctness is a release dependency. Schemas, stable IDs, referential ch
 
 # 3. Recommended Technical Stack
 
-| Concern | Recommendation | Rationale |
-|---|---|---|
-| Mobile | Expo-managed React Native + strict TypeScript | Mature cross-platform delivery, accessible native controls, over-the-air-capable asset strategy, and lower operational cost than two native apps. Escape to custom native modules remains possible. |
-| Routing | Expo Router over React Navigation primitives | Typed/file-based routes, native stacks, natural origin-aware back behavior, URL/deep-link readiness, and nested Library/Combos/Testing flows. Do not encode taxonomy as mandatory route nesting. |
-| Client state | Local component state + Zustand for small transient cross-flow context | Keep profile origin, selected combo substances, testing selection, and contextual warning focus explicit without a large event/state framework. Persist only designated data. |
-| Persistence | `expo-sqlite/kv-store`-compatible key/value adapter (or AsyncStorage if SDK constraints require it) | Recently Viewed is small, local, and account-free. Hide the implementation behind a versioned storage interface. SQLite remains available if offline preferences later grow. |
-| Content | Authored YAML/JSON documents, validated with Zod at build/test time, compiled to normalized JSON/index assets | Human-reviewable diffs plus typed, fast, offline runtime data. A generator can build search and reference indexes without shipping authoring overhead. |
-| Search | In-memory normalized index with deterministic scoring; bounded edit-distance/fuzzy matching (Fuse.js only if bundle/performance tests justify it) | Dataset is local and substance-only. A small explicit scorer makes priority and ambiguity behavior testable. Normalize Unicode, punctuation, spacing, hyphens, and known search terms. |
-| UI | React Native `StyleSheet`, semantic design tokens, local font/illustration assets, Reanimated only where motion adds value | Avoid premature styling frameworks and keep dynamic type, reduced motion, and native semantics visible. |
-| Validation/tests | Zod, Vitest/Jest-compatible unit runner selected with the Expo template, React Native Testing Library, Maestro E2E, axe-like/manual accessibility checks | Covers content, ranking, rendering, persistence, navigation, and device-level critical paths. Select exact runner versions during scaffold based on the then-current Expo template. |
-| Quality/release | ESLint, Prettier, TypeScript, GitHub Actions, EAS Build/Submit/Update, Sentry after privacy review | Conventional maintenance and reproducible preview/release builds. Crash reporting must collect no substance-view history or sensitive content context by default. |
+| Concern          | Recommendation                                                                                                                                           | Rationale                                                                                                                                                                                           |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mobile           | Expo-managed React Native + strict TypeScript                                                                                                            | Mature cross-platform delivery, accessible native controls, over-the-air-capable asset strategy, and lower operational cost than two native apps. Escape to custom native modules remains possible. |
+| Routing          | Expo Router over React Navigation primitives                                                                                                             | Typed/file-based routes, native stacks, natural origin-aware back behavior, URL/deep-link readiness, and nested Library/Combos/Testing flows. Do not encode taxonomy as mandatory route nesting.    |
+| Client state     | Local component state + Zustand for small transient cross-flow context                                                                                   | Keep profile origin, selected combo substances, testing selection, and contextual warning focus explicit without a large event/state framework. Persist only designated data.                       |
+| Persistence      | `expo-sqlite/kv-store`-compatible key/value adapter (or AsyncStorage if SDK constraints require it)                                                      | Recently Viewed is small, local, and account-free. Hide the implementation behind a versioned storage interface. SQLite remains available if offline preferences later grow.                        |
+| Content          | Authored YAML/JSON documents, validated with Zod at build/test time, compiled to normalized JSON/index assets                                            | Human-reviewable diffs plus typed, fast, offline runtime data. A generator can build search and reference indexes without shipping authoring overhead.                                              |
+| Search           | In-memory normalized index with deterministic scoring; bounded edit-distance/fuzzy matching (Fuse.js only if bundle/performance tests justify it)        | Dataset is local and substance-only. A small explicit scorer makes priority and ambiguity behavior testable. Normalize Unicode, punctuation, spacing, hyphens, and known search terms.              |
+| UI               | React Native `StyleSheet`, semantic design tokens, local font/illustration assets, Reanimated only where motion adds value                               | Avoid premature styling frameworks and keep dynamic type, reduced motion, and native semantics visible.                                                                                             |
+| Validation/tests | Zod, Vitest/Jest-compatible unit runner selected with the Expo template, React Native Testing Library, Maestro E2E, axe-like/manual accessibility checks | Covers content, ranking, rendering, persistence, navigation, and device-level critical paths. Select exact runner versions during scaffold based on the then-current Expo template.                 |
+| Quality/release  | ESLint, Prettier, TypeScript, GitHub Actions, EAS Build/Submit/Update, Sentry after privacy review                                                       | Conventional maintenance and reproducible preview/release builds. Crash reporting must collect no substance-view history or sensitive content context by default.                                   |
 
 Flutter is a credible alternative, but React Native/Expo better fits content-heavy TypeScript schemas, generated assets, and common editorial/web tooling. A backend/CMS should wait until update cadence, author roles, and remote-content safety controls are understood.
 
@@ -121,25 +121,25 @@ Generated files should carry a header and be changed only by scripts. Whether th
 
 All substantive entities and claims receive opaque, stable, human-readable IDs (for example `substance.mdma`, not display-name-derived routing). Display order is explicit. Localized/display strings never act as keys.
 
-| Model | Shape and ownership | Relationships / evidence / ordering |
-|---|---|---|
-| **Substance** | Referenced root entity: ID, canonical name, identity sentence, aliases, category IDs, subgroup IDs, visual key, orientation, structured profile sections, content status/review dates. | References taxonomy, routes, relationships, testing profile, claims, and sources. Section order is product-defined; sparse sections may be absent. |
-| **Alias** | Embedded value with ID, text, kind (`common`, `slang`, `abbreviation`, `chemical`, `misspelling/search`), display/search flags, reliability note, locale, rank. | An alias can point to multiple substance IDs in the generated reverse index; ambiguity is preserved. Curated display order. |
-| **Category / Subgroup** | Referenced taxonomy entities with stable IDs, label, description, visual identity, and order. Subgroups reference applicable categories but remain optional browse facets. | Substance↔category/subgroup is many-to-many. Referential validation prevents an ordinary class becoming an accidental “Weird Shit” fallback. |
-| **Route** | Referenced controlled vocabulary (`oral`, `insufflated`, etc.) with neutral display copy; unknown/other is not fabricated. | Reused by dose and timeline records. Route applicability lives on those records. |
-| **Dose Reference** | Embedded in Substance: ID, route ID, labeled ranges, units, precision qualifier, context, potency note, redosing note, evidence IDs, source IDs, order. | Never represented as a recommendation. Validator checks units/range ordering without asserting safety. Evidence/citations required. |
-| **Timeline** | Embedded route-aware record with ID and ranged phases: onset, come-up, main effects, after-effects; residual notes and uncertainty. | Route reference; explicit units/min/max and display order. Source/evidence attachment required. Absence renders “data unavailable,” not zero. |
-| **Effect / Unwanted Effect** | Embedded claims with stable IDs, concise label/body, commonality qualifier where supported, variability factors, evidence/source IDs, order. | Separate collections and semantics; not `good`/`bad`. Claim-level evidence supported. |
-| **Safety Claim** | Embedded/referenced claim record: ID, title/body, priority (`critical`, `important`, `context`), trigger/context, observable consequence, action IDs, evidence/source IDs, editorial rationale fields not exposed. | May be shared/referenced where interaction-specific; priority/order required. No substance aggregate. Context may elevate presentation without changing stored priority. |
-| **Harm-Reduction Action** | Embedded beside a substance claim unless reusable emergency action: ID, phase (`before/during/after` optional), behavior-first text, linked risk claim IDs, priority/order, evidence/source IDs. | Many actions may address one risk and vice versa. Validator requires actionable major risks to have counterparts or a documented exception. |
-| **Interaction** | Referenced canonical unordered set/pair record with ID, participant substance/class IDs, consequence/mechanism, situation qualifiers, priority, actions, uncertainty, evidence/source IDs. | Many-to-many. Canonical participant sorting prevents duplicates. Supports more than two participants structurally, while MVP UI can start with pairs. |
-| **Substance Relationship** | Embedded edge or generated referenced edge: ID, from/to IDs, typed relationship, directionality, explanatory text, source/evidence IDs, order. | Explicit only; inverse edges generated only when semantics allow. No recommendation score. |
-| **Testing Profile** | Referenced by substance: ID, specimen/context notes, limitations, misrepresentation/adulteration claims, reagent reaction IDs, lab-identification guidance, source/review metadata. | Can map multiple substances to one profile and one substance to variants if necessary. “Consistent with” language is validated editorially. |
-| **Reagent Reaction** | Referenced record: ID, substance/test target, reagent ID, time windows, color-transition sequence, caveats/interferences, evidence/source IDs. Reagent itself is controlled vocabulary. | Many-to-many across substances and reagents. Ordered stages; never yields a `verified` boolean. Image alt text/fallback required where visual references exist. |
-| **Emergency Sign** | Referenced or embedded sign: ID, observable wording, band (`expected`, `pay_attention`, `get_help`), immediate actions, context/substance IDs, order, source IDs. | General signs cover unknown cases; substance-specific additions merge deterministically. Urgent action precedes explanation. |
-| **Pharmacology Claim** | Embedded claim: ID, level (`plain`, `mechanism`, `deep`), body, targets/processes as structured metadata when useful, uncertainty, evidence/source IDs, order. | Plain-language claim must precede linked machinery. Conflicts can reference competing claim IDs. |
-| **Evidence Metadata** | Referenced record or embedded evidence assessment: ID, strength label (configurable), basis types, population/applicability, limitations, conflict flag, assessment/review date. | Attaches to claims, never every sentence by requirement. Labels are presentation-configurable because final UX is unresolved. |
-| **Source / Citation** | Referenced bibliography entity: ID, title, authors/organization, publication, year/date, DOI/PMID/URL, access date, source type, optional locator and retraction/status metadata. | Many-to-many claim↔source through citation references that can include locators/notes. Sources are deduplicated and link-checked. |
+| Model                        | Shape and ownership                                                                                                                                                                                                | Relationships / evidence / ordering                                                                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Substance**                | Referenced root entity: ID, canonical name, identity sentence, aliases, category IDs, subgroup IDs, visual key, orientation, structured profile sections, content status/review dates.                             | References taxonomy, routes, relationships, testing profile, claims, and sources. Section order is product-defined; sparse sections may be absent.                       |
+| **Alias**                    | Embedded value with ID, text, kind (`common`, `slang`, `abbreviation`, `chemical`, `misspelling/search`), display/search flags, reliability note, locale, rank.                                                    | An alias can point to multiple substance IDs in the generated reverse index; ambiguity is preserved. Curated display order.                                              |
+| **Category / Subgroup**      | Referenced taxonomy entities with stable IDs, label, description, visual identity, and order. Subgroups reference applicable categories but remain optional browse facets.                                         | Substance↔category/subgroup is many-to-many. Referential validation prevents an ordinary class becoming an accidental “Weird Shit” fallback.                            |
+| **Route**                    | Referenced controlled vocabulary (`oral`, `insufflated`, etc.) with neutral display copy; unknown/other is not fabricated.                                                                                         | Reused by dose and timeline records. Route applicability lives on those records.                                                                                         |
+| **Dose Reference**           | Embedded in Substance: ID, route ID, labeled ranges, units, precision qualifier, context, potency note, redosing note, evidence IDs, source IDs, order.                                                            | Never represented as a recommendation. Validator checks units/range ordering without asserting safety. Evidence/citations required.                                      |
+| **Timeline**                 | Embedded route-aware record with ID and ranged phases: onset, come-up, main effects, after-effects; residual notes and uncertainty.                                                                                | Route reference; explicit units/min/max and display order. Source/evidence attachment required. Absence renders “data unavailable,” not zero.                            |
+| **Effect / Unwanted Effect** | Embedded claims with stable IDs, concise label/body, commonality qualifier where supported, variability factors, evidence/source IDs, order.                                                                       | Separate collections and semantics; not `good`/`bad`. Claim-level evidence supported.                                                                                    |
+| **Safety Claim**             | Embedded/referenced claim record: ID, title/body, priority (`critical`, `important`, `context`), trigger/context, observable consequence, action IDs, evidence/source IDs, editorial rationale fields not exposed. | May be shared/referenced where interaction-specific; priority/order required. No substance aggregate. Context may elevate presentation without changing stored priority. |
+| **Harm-Reduction Action**    | Embedded beside a substance claim unless reusable emergency action: ID, phase (`before/during/after` optional), behavior-first text, linked risk claim IDs, priority/order, evidence/source IDs.                   | Many actions may address one risk and vice versa. Validator requires actionable major risks to have counterparts or a documented exception.                              |
+| **Interaction**              | Referenced canonical unordered set/pair record with ID, participant substance/class IDs, consequence/mechanism, situation qualifiers, priority, actions, uncertainty, evidence/source IDs.                         | Many-to-many. Canonical participant sorting prevents duplicates. Supports more than two participants structurally, while MVP UI can start with pairs.                    |
+| **Substance Relationship**   | Embedded edge or generated referenced edge: ID, from/to IDs, typed relationship, directionality, explanatory text, source/evidence IDs, order.                                                                     | Explicit only; inverse edges generated only when semantics allow. No recommendation score.                                                                               |
+| **Testing Profile**          | Referenced by substance: ID, specimen/context notes, limitations, misrepresentation/adulteration claims, reagent reaction IDs, lab-identification guidance, source/review metadata.                                | Can map multiple substances to one profile and one substance to variants if necessary. “Consistent with” language is validated editorially.                              |
+| **Reagent Reaction**         | Referenced record: ID, substance/test target, reagent ID, time windows, color-transition sequence, caveats/interferences, evidence/source IDs. Reagent itself is controlled vocabulary.                            | Many-to-many across substances and reagents. Ordered stages; never yields a `verified` boolean. Image alt text/fallback required where visual references exist.          |
+| **Emergency Sign**           | Referenced or embedded sign: ID, observable wording, band (`expected`, `pay_attention`, `get_help`), immediate actions, context/substance IDs, order, source IDs.                                                  | General signs cover unknown cases; substance-specific additions merge deterministically. Urgent action precedes explanation.                                             |
+| **Pharmacology Claim**       | Embedded claim: ID, level (`plain`, `mechanism`, `deep`), body, targets/processes as structured metadata when useful, uncertainty, evidence/source IDs, order.                                                     | Plain-language claim must precede linked machinery. Conflicts can reference competing claim IDs.                                                                         |
+| **Evidence Metadata**        | Referenced record or embedded evidence assessment: ID, strength label (configurable), basis types, population/applicability, limitations, conflict flag, assessment/review date.                                   | Attaches to claims, never every sentence by requirement. Labels are presentation-configurable because final UX is unresolved.                                            |
+| **Source / Citation**        | Referenced bibliography entity: ID, title, authors/organization, publication, year/date, DOI/PMID/URL, access date, source type, optional locator and retraction/status metadata.                                  | Many-to-many claim↔source through citation references that can include locators/notes. Sources are deduplicated and link-checked.                                       |
 
 Small profile-local records are embedded to keep one substance auditable. Globally shared entities—taxonomy, routes, interactions, reagents, evidence assessments, sources—are referenced. Generated indexes denormalize for runtime reads; editorial sources remain authoritative.
 
@@ -149,218 +149,218 @@ Legend: **Blocks** means the item gates meaningful later work, not merely that a
 
 ## A. Project Foundation
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Record architecture decisions and choose current Expo template/tool versions; prevents foundation drift. | P0 | S | Approval | PARTIALLY DEFINED | Yes |
-| Scaffold strict TypeScript Expo app, package scripts, aliases, lint/format/typecheck, and pinned lockfile. | P0 | M | Stack ADR | LOCKED | Yes |
-| Add CI for install, generated-file check, validation, lint, typecheck, unit tests, and build smoke test. | P0 | M | Scaffold | LOCKED | Yes |
-| Establish environment/config and privacy-safe logging rules; avoid accidental sensitive analytics. | P1 | S | Scaffold, privacy decision | PARTIALLY DEFINED | No |
+| Task / why                                                                                                 | Pri | Size | Dependencies               | Status            | Blocks |
+| ---------------------------------------------------------------------------------------------------------- | --: | ---: | -------------------------- | ----------------- | ------ |
+| Record architecture decisions and choose current Expo template/tool versions; prevents foundation drift.   |  P0 |    S | Approval                   | PARTIALLY DEFINED | Yes    |
+| Scaffold strict TypeScript Expo app, package scripts, aliases, lint/format/typecheck, and pinned lockfile. |  P0 |    M | Stack ADR                  | LOCKED            | Yes    |
+| Add CI for install, generated-file check, validation, lint, typecheck, unit tests, and build smoke test.   |  P0 |    M | Scaffold                   | LOCKED            | Yes    |
+| Establish environment/config and privacy-safe logging rules; avoid accidental sensitive analytics.         |  P1 |    S | Scaffold, privacy decision | PARTIALLY DEFINED | No     |
 
 ## B. Application Architecture
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Implement presentation/application/domain/infrastructure boundaries and import rules. | P0 | M | Foundation | LOCKED | Yes |
-| Define repository, storage, clock, asset, and observability interfaces with test fakes. | P0 | M | Domain IDs | PARTIALLY DEFINED | Yes |
-| Define typed result/error/unavailable states; sparse or stale content must fail safely. | P1 | S | Boundaries | LOCKED | No |
-| Add content-version compatibility and migration seams without a remote service. | P1 | M | Schema, persistence | PARTIALLY DEFINED | Yes |
+| Task / why                                                                              | Pri | Size | Dependencies        | Status            | Blocks |
+| --------------------------------------------------------------------------------------- | --: | ---: | ------------------- | ----------------- | ------ |
+| Implement presentation/application/domain/infrastructure boundaries and import rules.   |  P0 |    M | Foundation          | LOCKED            | Yes    |
+| Define repository, storage, clock, asset, and observability interfaces with test fakes. |  P0 |    M | Domain IDs          | PARTIALLY DEFINED | Yes    |
+| Define typed result/error/unavailable states; sparse or stale content must fail safely. |  P1 |    S | Boundaries          | LOCKED            | No     |
+| Add content-version compatibility and migration seams without a remote service.         |  P1 |    M | Schema, persistence | PARTIALLY DEFINED | Yes    |
 
 ## C. Design System
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Define semantic color, type, spacing, radius, surface, icon, and motion tokens in dark-first themes. | P0 | M | Brand review | PARTIALLY DEFINED | Yes |
-| Build accessible Text, Surface, Button, Link, Chip, Card, Divider, Icon, and Section primitives. | P0 | L | Tokens | LOCKED | Yes |
-| Build Important/Critical callouts and separate Emergency primitives with non-color cues. | P0 | M | Tokens, safety semantics | LOCKED | Yes |
-| Build section headers, metadata rows, disclosure, timeline, evidence indicator, skeleton/error, and illustration fallback primitives. | P1 | L | Core primitives | PARTIALLY DEFINED | No |
-| Stress-test long names/aliases, Dynamic Type, narrow screens, dense and sparse content. | P1 | M | Primitives, fixtures | LOCKED | No |
+| Task / why                                                                                                                            | Pri | Size | Dependencies             | Status            | Blocks |
+| ------------------------------------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------------ | ----------------- | ------ |
+| Define semantic color, type, spacing, radius, surface, icon, and motion tokens in dark-first themes.                                  |  P0 |    M | Brand review             | PARTIALLY DEFINED | Yes    |
+| Build accessible Text, Surface, Button, Link, Chip, Card, Divider, Icon, and Section primitives.                                      |  P0 |    L | Tokens                   | LOCKED            | Yes    |
+| Build Important/Critical callouts and separate Emergency primitives with non-color cues.                                              |  P0 |    M | Tokens, safety semantics | LOCKED            | Yes    |
+| Build section headers, metadata rows, disclosure, timeline, evidence indicator, skeleton/error, and illustration fallback primitives. |  P1 |    L | Core primitives          | PARTIALLY DEFINED | No     |
+| Stress-test long names/aliases, Dynamic Type, narrow screens, dense and sparse content.                                               |  P1 |    M | Primitives, fixtures     | LOCKED            | No     |
 
 ## D. Navigation
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Define typed route contract and native stacks for Library, Profile, Combos, Testing, and Emergency. | P0 | M | Foundation | LOCKED | Yes |
-| Preserve actual origin, filter/query/list scroll, and profile scroll on back. | P1 | L | Route contract, screens | LOCKED | Yes |
-| Implement validated Profile↔Combos and Profile→Testing context handoffs/focus IDs. | P1 | M | Domain IDs, feature shells | LOCKED | Yes |
-| Add direct-link fallback behavior and later-ready deep-link mapping. | P2 | S | Route contract | PARTIALLY DEFINED | No |
+| Task / why                                                                                          | Pri | Size | Dependencies               | Status            | Blocks |
+| --------------------------------------------------------------------------------------------------- | --: | ---: | -------------------------- | ----------------- | ------ |
+| Define typed route contract and native stacks for Library, Profile, Combos, Testing, and Emergency. |  P0 |    M | Foundation                 | LOCKED            | Yes    |
+| Preserve actual origin, filter/query/list scroll, and profile scroll on back.                       |  P1 |    L | Route contract, screens    | LOCKED            | Yes    |
+| Implement validated Profile↔Combos and Profile→Testing context handoffs/focus IDs.                 |  P1 |    M | Domain IDs, feature shells | LOCKED            | Yes    |
+| Add direct-link fallback behavior and later-ready deep-link mapping.                                |  P2 |    S | Route contract             | PARTIALLY DEFINED | No     |
 
 ## E. Data / Content Models
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Define branded stable IDs, enums, Zod schemas, and inferred TypeScript types for every model in §6. | P0 | XL | Data ADR, evidence decision | PARTIALLY DEFINED | Yes |
-| Encode invariants: route-aware ranges, priority on claims, no aggregate risk, citation/review requirements, unique IDs. | P0 | L | Schemas | LOCKED | Yes |
-| Validate cross-references, relationship direction, interaction uniqueness, ordering, asset existence, and risk→action links. | P0 | L | Schemas | LOCKED | Yes |
-| Create dense, sparse, uncertain, long-text, unknown-data, and critical-override fixtures. | P0 | M | Schemas | LOCKED | Yes |
-| Define additive schema versions and content migration policy. | P1 | M | Schemas | PARTIALLY DEFINED | Yes |
+| Task / why                                                                                                                   | Pri | Size | Dependencies                | Status            | Blocks |
+| ---------------------------------------------------------------------------------------------------------------------------- | --: | ---: | --------------------------- | ----------------- | ------ |
+| Define branded stable IDs, enums, Zod schemas, and inferred TypeScript types for every model in §6.                          |  P0 |   XL | Data ADR, evidence decision | PARTIALLY DEFINED | Yes    |
+| Encode invariants: route-aware ranges, priority on claims, no aggregate risk, citation/review requirements, unique IDs.      |  P0 |    L | Schemas                     | LOCKED            | Yes    |
+| Validate cross-references, relationship direction, interaction uniqueness, ordering, asset existence, and risk→action links. |  P0 |    L | Schemas                     | LOCKED            | Yes    |
+| Create dense, sparse, uncertain, long-text, unknown-data, and critical-override fixtures.                                    |  P0 |    M | Schemas                     | LOCKED            | Yes    |
+| Define additive schema versions and content migration policy.                                                                |  P1 |    M | Schemas                     | PARTIALLY DEFINED | Yes    |
 
 ## F. Substance Library
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Build Library hierarchy: Search, category-first browse, conditional Recent, and A–Z. | P1 | L | Cards, repository, navigation | LOCKED | No |
-| Build category and optional contextual subgroup views/chips without mandatory nesting. | P1 | M | Taxonomy, navigation | LOCKED | No |
-| Implement exact Standard/Compact card contracts and visual-family/fallback treatment. | P1 | M | Design primitives, models | LOCKED | Yes |
-| Add no-content, missing-art, loading/error, long-list, and large-library virtualization states. | P1 | M | Library screens | LOCKED | No |
+| Task / why                                                                                      | Pri | Size | Dependencies                  | Status | Blocks |
+| ----------------------------------------------------------------------------------------------- | --: | ---: | ----------------------------- | ------ | ------ |
+| Build Library hierarchy: Search, category-first browse, conditional Recent, and A–Z.            |  P1 |    L | Cards, repository, navigation | LOCKED | No     |
+| Build category and optional contextual subgroup views/chips without mandatory nesting.          |  P1 |    M | Taxonomy, navigation          | LOCKED | No     |
+| Implement exact Standard/Compact card contracts and visual-family/fallback treatment.           |  P1 |    M | Design primitives, models     | LOCKED | Yes    |
+| Add no-content, missing-art, loading/error, long-list, and large-library virtualization states. |  P1 |    M | Library screens               | LOCKED | No     |
 
 ## G. Search
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Build normalized index for canonical, alias, abbreviation, chemical, formatting, and misspelling fields. | P0 | M | Content schema | LOCKED | Yes |
-| Implement deterministic tiered ranking, prefix/partial and bounded fuzzy scoring. | P1 | L | Index | LOCKED | No |
-| Preserve ambiguous slang as multiple results with identifier-reliability guidance. | P1 | M | Ranking, alias model | LOCKED | No |
-| Add accessible results, debounce, empty query, no-results, typo, long-query, and performance behavior. | P1 | M | UI, ranking | LOCKED | No |
+| Task / why                                                                                               | Pri | Size | Dependencies         | Status | Blocks |
+| -------------------------------------------------------------------------------------------------------- | --: | ---: | -------------------- | ------ | ------ |
+| Build normalized index for canonical, alias, abbreviation, chemical, formatting, and misspelling fields. |  P0 |    M | Content schema       | LOCKED | Yes    |
+| Implement deterministic tiered ranking, prefix/partial and bounded fuzzy scoring.                        |  P1 |    L | Index                | LOCKED | No     |
+| Preserve ambiguous slang as multiple results with identifier-reliability guidance.                       |  P1 |    M | Ranking, alias model | LOCKED | No     |
+| Add accessible results, debounce, empty query, no-results, typo, long-query, and performance behavior.   |  P1 |    M | UI, ranking          | LOCKED | No     |
 
 ## H. Recently Viewed
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Implement versioned local repository, dedupe, recency ordering, cap, invalid-ID cleanup, and migration. | P1 | M | Storage interface, IDs | LOCKED | No |
-| Record meaningful profile views and render Compact Cards; hide section when empty. | P1 | S | Profile, Library | LOCKED | No |
-| Test reinstall/upgrade expectations, corruption fallback, and privacy/no-sync behavior. | P2 | S | Persistence | PARTIALLY DEFINED | No |
+| Task / why                                                                                              | Pri | Size | Dependencies           | Status            | Blocks |
+| ------------------------------------------------------------------------------------------------------- | --: | ---: | ---------------------- | ----------------- | ------ |
+| Implement versioned local repository, dedupe, recency ordering, cap, invalid-ID cleanup, and migration. |  P1 |    M | Storage interface, IDs | LOCKED            | No     |
+| Record meaningful profile views and render Compact Cards; hide section when empty.                      |  P1 |    S | Profile, Library       | LOCKED            | No     |
+| Test reinstall/upgrade expectations, corruption fallback, and privacy/no-sync behavior.                 |  P2 |    S | Persistence            | PARTIALLY DEFINED | No     |
 
 ## I. Substance Profiles
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Compose five progressive layers with omitted-section and unavailable-data rules. | P1 | XL | Models, primitives | LOCKED | No |
-| Build Snapshot with identity, aliases, compact orientation, and at most warranted critical callouts. | P1 | M | Safety selector | LOCKED | Yes |
-| Build Before You Take It, What to Expect, Know What You Have, and Rabbit Hole modules. | P1 | XL | Feature models | LOCKED | No |
-| Add taxonomy chips, explicit relationships, profile-to-profile stack behavior, and contextual focus. | P1 | M | Relationships, navigation | LOCKED | No |
-| Test sparse/dense profiles, long content, cross-reference failure, scroll restoration, and section accessibility. | P1 | L | Profile composition | LOCKED | No |
+| Task / why                                                                                                        | Pri | Size | Dependencies              | Status | Blocks |
+| ----------------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------------- | ------ | ------ |
+| Compose five progressive layers with omitted-section and unavailable-data rules.                                  |  P1 |   XL | Models, primitives        | LOCKED | No     |
+| Build Snapshot with identity, aliases, compact orientation, and at most warranted critical callouts.              |  P1 |    M | Safety selector           | LOCKED | Yes    |
+| Build Before You Take It, What to Expect, Know What You Have, and Rabbit Hole modules.                            |  P1 |   XL | Feature models            | LOCKED | No     |
+| Add taxonomy chips, explicit relationships, profile-to-profile stack behavior, and contextual focus.              |  P1 |    M | Relationships, navigation | LOCKED | No     |
+| Test sparse/dense profiles, long content, cross-reference failure, scroll restoration, and section accessibility. |  P1 |    L | Profile composition       | LOCKED | No     |
 
 ## J. Safety Priority System
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Encode claim-level Critical/Important/Context semantics and editorial validation; prohibit substance scores. | P0 | M | Safety schema | LOCKED | Yes |
-| Implement deterministic placement and maximum Snapshot interruption rules. | P1 | M | Profile, callouts | LOCKED | No |
-| Implement ephemeral context elevation that cites interaction context without mutating canonical priority. | P1 | M | Navigation context, interactions | LOCKED | No |
-| Add visual/regression/accessibility tests for each priority and multiple-callout edge cases. | P1 | M | UI | LOCKED | No |
+| Task / why                                                                                                   | Pri | Size | Dependencies                     | Status | Blocks |
+| ------------------------------------------------------------------------------------------------------------ | --: | ---: | -------------------------------- | ------ | ------ |
+| Encode claim-level Critical/Important/Context semantics and editorial validation; prohibit substance scores. |  P0 |    M | Safety schema                    | LOCKED | Yes    |
+| Implement deterministic placement and maximum Snapshot interruption rules.                                   |  P1 |    M | Profile, callouts                | LOCKED | No     |
+| Implement ephemeral context elevation that cites interaction context without mutating canonical priority.    |  P1 |    M | Navigation context, interactions | LOCKED | No     |
+| Add visual/regression/accessibility tests for each priority and multiple-callout edge cases.                 |  P1 |    M | UI                               | LOCKED | No     |
 
 ## K. Dose / Potency
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Validate route-specific descriptive ranges, units, uncertainty, precision, and citations. | P1 | M | Route/dose schema | LOCKED | No |
-| Render reference ranges separately from potency/sensitivity and redosing considerations. | P1 | M | Profile primitives | LOCKED | No |
-| Add copy lint against “safe/recommended dose,” universal ranges, calculators, and unsupported precision. | P1 | S | Editorial tooling | LOCKED | No |
+| Task / why                                                                                               | Pri | Size | Dependencies       | Status | Blocks |
+| -------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------ | ------ | ------ |
+| Validate route-specific descriptive ranges, units, uncertainty, precision, and citations.                |  P1 |    M | Route/dose schema  | LOCKED | No     |
+| Render reference ranges separately from potency/sensitivity and redosing considerations.                 |  P1 |    M | Profile primitives | LOCKED | No     |
+| Add copy lint against “safe/recommended dose,” universal ranges, calculators, and unsupported precision. |  P1 |    S | Editorial tooling  | LOCKED | No     |
 
 ## L. Timeline
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Validate route-aware ranged phases and explicit residual/unknown states. | P1 | M | Timeline schema | LOCKED | No |
-| Build accessible visual-and-text timeline without false precision or baseline implication. | P1 | L | Design primitives | LOCKED | No |
-| Test delayed onset, overlapping routes, long duration, absent phases, and font scaling. | P1 | M | Timeline UI | LOCKED | No |
+| Task / why                                                                                 | Pri | Size | Dependencies      | Status | Blocks |
+| ------------------------------------------------------------------------------------------ | --: | ---: | ----------------- | ------ | ------ |
+| Validate route-aware ranged phases and explicit residual/unknown states.                   |  P1 |    M | Timeline schema   | LOCKED | No     |
+| Build accessible visual-and-text timeline without false precision or baseline implication. |  P1 |    L | Design primitives | LOCKED | No     |
+| Test delayed onset, overlapping routes, long duration, absent phases, and font scaling.    |  P1 |    M | Timeline UI       | LOCKED | No     |
 
 ## M. Effects
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Render Common Effects, Common Unwanted Effects, and substance-specific variability separately from risks. | P1 | M | Effect schemas, profile | LOCKED | No |
-| Support evidence-aware qualifiers, ordering, sparse data, and no `good`/`bad` labels. | P1 | S | Evidence interface | LOCKED | No |
+| Task / why                                                                                                | Pri | Size | Dependencies            | Status | Blocks |
+| --------------------------------------------------------------------------------------------------------- | --: | ---: | ----------------------- | ------ | ------ |
+| Render Common Effects, Common Unwanted Effects, and substance-specific variability separately from risks. |  P1 |    M | Effect schemas, profile | LOCKED | No     |
+| Support evidence-aware qualifiers, ordering, sparse data, and no `good`/`bad` labels.                     |  P1 |    S | Evidence interface      | LOCKED | No     |
 
 ## N. Harm Reduction
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Model and render prioritized Risk→Action links, optionally grouped Before/During/After. | P1 | L | Safety/action schema | LOCKED | No |
-| Validate every major actionable risk has an action or reviewed exception; reject generic padding. | P0 | M | Content linter | LOCKED | Yes |
-| Test missing phase groups, one-to-many links, and action-first screen-reader order. | P1 | S | UI | LOCKED | No |
+| Task / why                                                                                        | Pri | Size | Dependencies         | Status | Blocks |
+| ------------------------------------------------------------------------------------------------- | --: | ---: | -------------------- | ------ | ------ |
+| Model and render prioritized Risk→Action links, optionally grouped Before/During/After.           |  P1 |    L | Safety/action schema | LOCKED | No     |
+| Validate every major actionable risk has an action or reviewed exception; reject generic padding. |  P0 |    M | Content linter       | LOCKED | Yes    |
+| Test missing phase groups, one-to-many links, and action-first screen-reader order.               |  P1 |    S | UI                   | LOCKED | No     |
 
 ## O. Combination Checker
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Finalize pair vs multi-select MVP behavior and interaction outcome vocabulary. | P0 | M | Product decision | UNRESOLVED | Yes |
-| Build substance selector using search with preselection and duplicate prevention. | P1 | M | Search, navigation context | LOCKED | No |
-| Implement canonical interaction lookup, qualifier handling, unknown/no-data distinction, consequence/mechanism, actions, evidence. | P1 | L | Interaction schema/content | PARTIALLY DEFINED | No |
-| Link to profiles with focused interaction context and preserve combo draft on back. | P1 | M | Navigation | LOCKED | No |
-| Test symmetry, class-vs-substance rules, 3+ cases if supported, missing data, and serious-context elevation. | P1 | L | Logic, fixtures | PARTIALLY DEFINED | No |
+| Task / why                                                                                                                         | Pri | Size | Dependencies               | Status            | Blocks |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --: | ---: | -------------------------- | ----------------- | ------ |
+| Finalize pair vs multi-select MVP behavior and interaction outcome vocabulary.                                                     |  P0 |    M | Product decision           | UNRESOLVED        | Yes    |
+| Build substance selector using search with preselection and duplicate prevention.                                                  |  P1 |    M | Search, navigation context | LOCKED            | No     |
+| Implement canonical interaction lookup, qualifier handling, unknown/no-data distinction, consequence/mechanism, actions, evidence. |  P1 |    L | Interaction schema/content | PARTIALLY DEFINED | No     |
+| Link to profiles with focused interaction context and preserve combo draft on back.                                                |  P1 |    M | Navigation                 | LOCKED            | No     |
+| Test symmetry, class-vs-substance rules, 3+ cases if supported, missing data, and serious-context elevation.                       |  P1 |    L | Logic, fixtures            | PARTIALLY DEFINED | No     |
 
 ## P. Testing / Reagent Guide
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Finalize supported reagents, reaction representation, time/color accessibility, and regional caveats. | P0 | M | Expert/editorial input | UNRESOLVED | Yes |
-| Build preselected substance guide explaining capability, “consistent with” result, and limitations before results. | P1 | L | Testing schema, navigation | LOCKED | No |
-| Render ordered color/time reactions with text equivalents, interference and adulteration notes, plus lab-identification route. | P1 | L | Reagent data, design | PARTIALLY DEFINED | No |
-| Add unknown/unlisted/no-data paths and prohibit confirmed/verified claims. | P1 | M | Editorial lints | LOCKED | No |
-| Test color-blind usability, timing ambiguity, multiple reagents, and image fallback. | P1 | M | UI/data | LOCKED | No |
+| Task / why                                                                                                                     | Pri | Size | Dependencies               | Status            | Blocks |
+| ------------------------------------------------------------------------------------------------------------------------------ | --: | ---: | -------------------------- | ----------------- | ------ |
+| Finalize supported reagents, reaction representation, time/color accessibility, and regional caveats.                          |  P0 |    M | Expert/editorial input     | UNRESOLVED        | Yes    |
+| Build preselected substance guide explaining capability, “consistent with” result, and limitations before results.             |  P1 |    L | Testing schema, navigation | LOCKED            | No     |
+| Render ordered color/time reactions with text equivalents, interference and adulteration notes, plus lab-identification route. |  P1 |    L | Reagent data, design       | PARTIALLY DEFINED | No     |
+| Add unknown/unlisted/no-data paths and prohibit confirmed/verified claims.                                                     |  P1 |    M | Editorial lints            | LOCKED            | No     |
+| Test color-blind usability, timing ambiguity, multiple reagents, and image fallback.                                           |  P1 |    M | UI/data                    | LOCKED            | No     |
 
 ## Q. Emergency Pathway
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Obtain clinical/legal review of universal and substance-specific emergency content and locale behavior. | P0 | L | Target-market decision | UNRESOLVED | Yes |
-| Build persistent “Something feels wrong?” access and root emergency route with unknown substance/dose/multiple/adulteration support. | P1 | L | Navigation, reviewed content | LOCKED | No |
-| Render action-first observable signs as Expected / Pay attention / Get emergency help, never diagnostic severity labels. | P1 | L | Emergency model/design | LOCKED | No |
-| Implement locale-aware emergency calling guidance, safe offline fallback, and confirmation behavior that never delays action. | P1 | M | Market/legal decisions | UNRESOLVED | No |
-| Test locked/offline-like conditions, screen reader, large text, one-handed use, orientation, interruption, and known-context merge. | P0 | L | Emergency UI | LOCKED | Yes |
+| Task / why                                                                                                                           | Pri | Size | Dependencies                 | Status     | Blocks |
+| ------------------------------------------------------------------------------------------------------------------------------------ | --: | ---: | ---------------------------- | ---------- | ------ |
+| Obtain clinical/legal review of universal and substance-specific emergency content and locale behavior.                              |  P0 |    L | Target-market decision       | UNRESOLVED | Yes    |
+| Build persistent “Something feels wrong?” access and root emergency route with unknown substance/dose/multiple/adulteration support. |  P1 |    L | Navigation, reviewed content | LOCKED     | No     |
+| Render action-first observable signs as Expected / Pay attention / Get emergency help, never diagnostic severity labels.             |  P1 |    L | Emergency model/design       | LOCKED     | No     |
+| Implement locale-aware emergency calling guidance, safe offline fallback, and confirmation behavior that never delays action.        |  P1 |    M | Market/legal decisions       | UNRESOLVED | No     |
+| Test locked/offline-like conditions, screen reader, large text, one-handed use, orientation, interruption, and known-context merge.  |  P0 |    L | Emergency UI                 | LOCKED     | Yes    |
 
 ## R. Evidence / Citations
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Define claim-source links, evidence bases, applicability, conflict, review dates, and literature-depth descriptor. | P0 | L | Evidence product decision | PARTIALLY DEFINED | Yes |
-| Keep label vocabulary/presentation configurable and show signals only where material. | P1 | M | Evidence model, design | PARTIALLY DEFINED | No |
-| Build citations/source details, stable locators, offline metadata, broken-link/retraction checks. | P1 | L | Source corpus | LOCKED | No |
-| Clearly distinguish community reports and inferred mechanisms from clinical evidence. | P1 | M | Editorial rules | LOCKED | No |
+| Task / why                                                                                                         | Pri | Size | Dependencies              | Status            | Blocks |
+| ------------------------------------------------------------------------------------------------------------------ | --: | ---: | ------------------------- | ----------------- | ------ |
+| Define claim-source links, evidence bases, applicability, conflict, review dates, and literature-depth descriptor. |  P0 |    L | Evidence product decision | PARTIALLY DEFINED | Yes    |
+| Keep label vocabulary/presentation configurable and show signals only where material.                              |  P1 |    M | Evidence model, design    | PARTIALLY DEFINED | No     |
+| Build citations/source details, stable locators, offline metadata, broken-link/retraction checks.                  |  P1 |    L | Source corpus             | LOCKED            | No     |
+| Clearly distinguish community reports and inferred mechanisms from clinical evidence.                              |  P1 |    M | Editorial rules           | LOCKED            | No     |
 
 ## S. Content Infrastructure
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Define authoring format/templates, ownership, lifecycle (`draft/reviewed/published/retired`), reviewer, review date. | P0 | M | Schemas, governance | PARTIALLY DEFINED | Yes |
-| Build deterministic validate/generate/index pipeline with actionable paths and committed-output policy. | P0 | L | Schemas | LOCKED | Yes |
-| Add semantic/editorial lints, orphan/broken reference checks, duplicate alias warnings, asset/alt validation. | P0 | L | Pipeline | LOCKED | Yes |
-| Establish medical/editorial two-person review, source acceptance, correction, and urgent-update procedures. | P0 | M | Product ownership | UNRESOLVED | Yes |
-| Design—but do not build—signed atomic remote bundle/rollback path when update needs justify it. | P3 | M | Proven cadence | PARTIALLY DEFINED | No |
+| Task / why                                                                                                           | Pri | Size | Dependencies        | Status            | Blocks |
+| -------------------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------- | ----------------- | ------ |
+| Define authoring format/templates, ownership, lifecycle (`draft/reviewed/published/retired`), reviewer, review date. |  P0 |    M | Schemas, governance | PARTIALLY DEFINED | Yes    |
+| Build deterministic validate/generate/index pipeline with actionable paths and committed-output policy.              |  P0 |    L | Schemas             | LOCKED            | Yes    |
+| Add semantic/editorial lints, orphan/broken reference checks, duplicate alias warnings, asset/alt validation.        |  P0 |    L | Pipeline            | LOCKED            | Yes    |
+| Establish medical/editorial two-person review, source acceptance, correction, and urgent-update procedures.          |  P0 |    M | Product ownership   | UNRESOLVED        | Yes    |
+| Design—but do not build—signed atomic remote bundle/rollback path when update needs justify it.                      |  P3 |    M | Proven cadence      | PARTIALLY DEFINED | No     |
 
 ## T. Accessibility
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Set accessibility baseline: WCAG-informed contrast, 44-point targets, semantic headings/labels, focus, Dynamic Type. | P0 | M | Design tokens | LOCKED | Yes |
-| Honor reduced motion; ensure severity, timelines, reactions, and charts have non-color/text equivalents. | P1 | M | Relevant components | LOCKED | No |
-| Test VoiceOver/TalkBack, font scaling, narrow/large screens, switch/keyboard where supported, and emergency task completion. | P1 | L | Feature slices | LOCKED | Yes |
+| Task / why                                                                                                                   | Pri | Size | Dependencies        | Status | Blocks |
+| ---------------------------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------- | ------ | ------ |
+| Set accessibility baseline: WCAG-informed contrast, 44-point targets, semantic headings/labels, focus, Dynamic Type.         |  P0 |    M | Design tokens       | LOCKED | Yes    |
+| Honor reduced motion; ensure severity, timelines, reactions, and charts have non-color/text equivalents.                     |  P1 |    M | Relevant components | LOCKED | No     |
+| Test VoiceOver/TalkBack, font scaling, narrow/large screens, switch/keyboard where supported, and emergency task completion. |  P1 |    L | Feature slices      | LOCKED | Yes    |
 
 ## U. Testing / QA
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Establish test pyramid, fixtures/builders, deterministic clocks/storage, coverage expectations, and CI gates. | P0 | M | Foundation | LOCKED | Yes |
-| Unit-test schemas, search tiers/fuzziness/ambiguity, interactions, priority selection, generation, and migrations. | P0 | L | Domain/application code | LOCKED | Yes |
-| Integration-test Library/Profile sparse+dense rendering, Recent, context handoffs, testing data, and emergency merge. | P1 | L | Features | LOCKED | No |
-| Add Maestro smoke paths and real-device matrix for iOS/Android, offline, rotation, memory pressure, and interruptions. | P1 | L | Stable builds | LOCKED | Yes |
-| Conduct clinician/editorial safety QA and regression checklist on every content release. | P0 | L | Governance/content | UNRESOLVED | Yes |
+| Task / why                                                                                                             | Pri | Size | Dependencies            | Status     | Blocks |
+| ---------------------------------------------------------------------------------------------------------------------- | --: | ---: | ----------------------- | ---------- | ------ |
+| Establish test pyramid, fixtures/builders, deterministic clocks/storage, coverage expectations, and CI gates.          |  P0 |    M | Foundation              | LOCKED     | Yes    |
+| Unit-test schemas, search tiers/fuzziness/ambiguity, interactions, priority selection, generation, and migrations.     |  P0 |    L | Domain/application code | LOCKED     | Yes    |
+| Integration-test Library/Profile sparse+dense rendering, Recent, context handoffs, testing data, and emergency merge.  |  P1 |    L | Features                | LOCKED     | No     |
+| Add Maestro smoke paths and real-device matrix for iOS/Android, offline, rotation, memory pressure, and interruptions. |  P1 |    L | Stable builds           | LOCKED     | Yes    |
+| Conduct clinician/editorial safety QA and regression checklist on every content release.                               |  P0 |    L | Governance/content      | UNRESOLVED | Yes    |
 
 ## V. Performance
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Set budgets for cold launch, search response, list/profile rendering, bundle/assets, and low-end devices. | P1 | S | Representative slice | PARTIALLY DEFINED | No |
-| Prebuild indexes, virtualize A–Z/category lists, memoize selectors, size illustrations, and avoid parsing source YAML at runtime. | P1 | M | Content pipeline/UI | LOCKED | No |
-| Profile large-library, dense-profile, low-memory, and offline startup fixtures; prevent emergency path delay. | P1 | M | Expanded fixtures | LOCKED | Yes |
+| Task / why                                                                                                                        | Pri | Size | Dependencies         | Status            | Blocks |
+| --------------------------------------------------------------------------------------------------------------------------------- | --: | ---: | -------------------- | ----------------- | ------ |
+| Set budgets for cold launch, search response, list/profile rendering, bundle/assets, and low-end devices.                         |  P1 |    S | Representative slice | PARTIALLY DEFINED | No     |
+| Prebuild indexes, virtualize A–Z/category lists, memoize selectors, size illustrations, and avoid parsing source YAML at runtime. |  P1 |    M | Content pipeline/UI  | LOCKED            | No     |
+| Profile large-library, dense-profile, low-memory, and offline startup fixtures; prevent emergency path delay.                     |  P1 |    M | Expanded fixtures    | LOCKED            | Yes    |
 
 ## W. Documentation
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Expand README and add AGENTS, product spec, architecture, data/content models, editorial rules, roadmap, ADRs, testing/release runbooks. | P0 | L | Approval/decisions | PARTIALLY DEFINED | Yes |
-| Document content authoring, validation errors, citation policy, critical-change review, and emergency escalation. | P0 | M | Governance | UNRESOLVED | Yes |
-| Keep diagrams and generated examples checked by CI to prevent documentation drift. | P2 | S | Pipeline | PARTIALLY DEFINED | No |
+| Task / why                                                                                                                               | Pri | Size | Dependencies       | Status            | Blocks |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | --: | ---: | ------------------ | ----------------- | ------ |
+| Expand README and add AGENTS, product spec, architecture, data/content models, editorial rules, roadmap, ADRs, testing/release runbooks. |  P0 |    L | Approval/decisions | PARTIALLY DEFINED | Yes    |
+| Document content authoring, validation errors, citation policy, critical-change review, and emergency escalation.                        |  P0 |    M | Governance         | UNRESOLVED        | Yes    |
+| Keep diagrams and generated examples checked by CI to prevent documentation drift.                                                       |  P2 |    S | Pipeline           | PARTIALLY DEFINED | No     |
 
 ## X. Release Readiness
 
-| Task / why | Pri | Size | Dependencies | Status | Blocks |
-|---|---:|---:|---|---|---|
-| Decide launch countries/languages; complete medical, legal, privacy, accessibility, and app-store policy reviews. | P0 | XL | Product ownership, content | UNRESOLVED | Yes |
-| Configure identifiers, signing, EAS profiles, environments, store metadata, privacy disclosures, and support/correction channel. | P1 | L | Market decisions, stable app | PARTIALLY DEFINED | Yes |
-| Define content freeze, source/review-date audit, emergency drill, rollback, incident response, and go/no-go checklist. | P0 | L | Governance, builds | UNRESOLVED | Yes |
-| Run beta on representative devices/users without collecting sensitive history; triage safety/usability findings. | P1 | L | Feature complete | PARTIALLY DEFINED | Yes |
+| Task / why                                                                                                                       | Pri | Size | Dependencies                 | Status            | Blocks |
+| -------------------------------------------------------------------------------------------------------------------------------- | --: | ---: | ---------------------------- | ----------------- | ------ |
+| Decide launch countries/languages; complete medical, legal, privacy, accessibility, and app-store policy reviews.                |  P0 |   XL | Product ownership, content   | UNRESOLVED        | Yes    |
+| Configure identifiers, signing, EAS profiles, environments, store metadata, privacy disclosures, and support/correction channel. |  P1 |    L | Market decisions, stable app | PARTIALLY DEFINED | Yes    |
+| Define content freeze, source/review-date audit, emergency drill, rollback, incident response, and go/no-go checklist.           |  P0 |    L | Governance, builds           | UNRESOLVED        | Yes    |
+| Run beta on representative devices/users without collecting sensitive history; triage safety/usability findings.                 |  P1 |    L | Feature complete             | PARTIALLY DEFINED | Yes    |
 
 # 8. Dependency Map
 

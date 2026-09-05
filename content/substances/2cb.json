@@ -1,1 +1,28 @@
-{"id":"substance.2cb","name":"2C-B","aliases":[{"text":"2CB","kind":"abbreviation","display":false},{"text":"Nexus","kind":"slang","display":true}],"searchTerms":["2 c b"],"categoryIds":["category.psychedelic"],"visual":{"symbol":"2B","color":"amber"},"identity":"A synthetic psychedelic phenethylamine with stimulant-like and perception-altering effects.","review":{"status":"needs_clinical_review","reviewedAt":"2026-09-01","reviewDue":"2026-12-01"},"safetyClaims":[{"id":"claim.2cb.uncertainty","priority":"important","title":"Identity and potency may be uncertain","body":"Products sold as 2C-B can be misrepresented, and relatively small quantity differences may change intensity.","action":"Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.","sourceIds":["source.nida.hallucinogens"]}],"sourceIds":["source.nida.hallucinogens"]}
+{
+  "id": "substance.2cb",
+  "name": "2C-B",
+  "aliases": [
+    { "text": "2CB", "kind": "abbreviation", "display": false },
+    { "text": "Nexus", "kind": "slang", "display": true }
+  ],
+  "searchTerms": ["2 c b"],
+  "categoryIds": ["category.psychedelic"],
+  "visual": { "symbol": "2B", "color": "amber" },
+  "identity": "A synthetic psychedelic phenethylamine with stimulant-like and perception-altering effects.",
+  "review": {
+    "status": "needs_clinical_review",
+    "reviewedAt": "2026-09-01",
+    "reviewDue": "2026-12-01"
+  },
+  "safetyClaims": [
+    {
+      "id": "claim.2cb.uncertainty",
+      "priority": "important",
+      "title": "Identity and potency may be uncertain",
+      "body": "Products sold as 2C-B can be misrepresented, and relatively small quantity differences may change intensity.",
+      "action": "Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.",
+      "sourceIds": ["source.nida.hallucinogens"]
+    }
+  ],
+  "sourceIds": ["source.nida.hallucinogens"]
+}

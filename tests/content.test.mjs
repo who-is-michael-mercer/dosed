@@ -1,11 +1,63 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {buildSearchIndex,loadContent,search,validateContent} from '../scripts/lib/content.mjs';
-const content=loadContent();
-test('seed content and all references validate',()=>assert.deepEqual(validateContent(content).errors,[]));
-test('invalid IDs, sources, ranges, routes and priorities fail',()=>{const bad=structuredClone(content);const mdma=bad.substances.find(x=>x.id==='substance.mdma');mdma.id='NO';mdma.sourceIds=['source.missing'];mdma.doseReferences[0].ranges[0]={min:9,max:1};mdma.doseReferences[0].route='telepathy';mdma.safetyClaims[0].priority='safe';const errors=validateContent(bad).errors.join(' ');for(const expected of ['invalid ID','broken source','invalid dose range','invalid route','invalid safety priority'])assert.match(errors,new RegExp(expected))});
-test('broken relationships fail',()=>{const bad=structuredClone(content);bad.substances.find(x=>x.id==='substance.mdma').relationships[0].substanceId='substance.nope';assert.match(validateContent(bad).errors.join(),/broken relationship/)});
-test('generation is deterministic',async()=>{const before=fs.readFileSync('generated/content.json','utf8');await import(`../scripts/generate-content.mjs?${Date.now()}`);assert.equal(fs.readFileSync('generated/content.json','utf8'),before)});
-const index=buildSearchIndex(content.substances);
-for(const [query,id] of [['MDMA','substance.mdma'],['molly','substance.mdma'],['2cb','substance.2cb'],['2-C B','substance.2cb'],['moly','substance.mdma']])test(`search ${query}`,()=>assert.equal(search(index,content.substances,query)[0]?.substance.id,id));
-test('scoring is deterministic and exact beats fuzzy',()=>assert.ok(search(index,content.substances,'ket')[0].score>search(index,content.substances,'kett')[0].score));
-test('ambiguous aliases remain multiple results',()=>{const substances=[...content.substances,{...content.substances.find(x=>x.id==='substance.mdma'),id:'substance.fixture',name:'Fixture'}];const idx=buildSearchIndex(substances);assert.equal(search(idx,substances,'molly').length,2)});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { buildSearchIndex, loadContent, search, validateContent } from '../scripts/lib/content.mjs';
+const content = loadContent();
+test('seed content and all references validate', () =>
+  assert.deepEqual(validateContent(content).errors, []));
+test('invalid IDs, sources, ranges, routes and priorities fail', () => {
+  const bad = structuredClone(content);
+  const mdma = bad.substances.find((x) => x.id === 'substance.mdma');
+  mdma.id = 'NO';
+  mdma.sourceIds = ['source.missing'];
+  mdma.doseReferences[0].ranges[0] = { min: 9, max: 1 };
+  mdma.doseReferences[0].route = 'telepathy';
+  mdma.safetyClaims[0].priority = 'safe';
+  const errors = validateContent(bad).errors.join(' ');
+  for (const expected of [
+    'invalid ID',
+    'broken source',
+    'invalid dose range',
+    'invalid route',
+    'invalid safety priority',
+  ])
+    assert.match(errors, new RegExp(expected));
+});
+test('broken relationships fail', () => {
+  const bad = structuredClone(content);
+  bad.substances.find((x) => x.id === 'substance.mdma').relationships[0].substanceId =
+    'substance.nope';
+  assert.match(validateContent(bad).errors.join(), /broken relationship/);
+});
+test('generation is deterministic', async () => {
+  const before = fs.readFileSync('generated/content.json', 'utf8');
+  await import(`../scripts/generate-content.mjs?${Date.now()}`);
+  assert.equal(fs.readFileSync('generated/content.json', 'utf8'), before);
+});
+const index = buildSearchIndex(content.substances);
+for (const [query, id] of [
+  ['MDMA', 'substance.mdma'],
+  ['molly', 'substance.mdma'],
+  ['2cb', 'substance.2cb'],
+  ['2-C B', 'substance.2cb'],
+  ['moly', 'substance.mdma'],
+])
+  test(`search ${query}`, () =>
+    assert.equal(search(index, content.substances, query)[0]?.substance.id, id));
+test('scoring is deterministic and exact beats fuzzy', () =>
+  assert.ok(
+    search(index, content.substances, 'ket')[0].score >
+      search(index, content.substances, 'kett')[0].score,
+  ));
+test('ambiguous aliases remain multiple results', () => {
+  const substances = [
+    ...content.substances,
+    {
+      ...content.substances.find((x) => x.id === 'substance.mdma'),
+      id: 'substance.fixture',
+      name: 'Fixture',
+    },
+  ];
+  const idx = buildSearchIndex(substances);
+  assert.equal(search(idx, substances, 'molly').length, 2);
+});

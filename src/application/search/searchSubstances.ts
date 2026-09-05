@@ -1,6 +1,44 @@
 import generated from '../../../generated/content.json';
 import type { Substance } from '../../domain/content';
-const normalize=(value:string)=>value.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
-const compact=(v:string)=>normalize(v).replaceAll(' ','');
-const distance=(a:string,b:string)=>{const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0]!;row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j]!;row[j]=Math.min(row[j]!+1,row[j-1]!+1,prev+(a[i-1]===b[j-1]?0:1));prev=old}}return row[b.length]!};
-export function searchSubstances(substances:readonly Substance[],query:string):Substance[]{const q=normalize(query),qc=compact(query);if(!q)return[];const scores=new Map<string,number>();for(const item of generated.searchIndex){let score=0;if(item.term===q||item.compact===qc)score=item.weight+100;else if(item.term.startsWith(q)||item.compact.startsWith(qc))score=item.weight+60-q.length;else {const d=distance(qc,item.compact);if(d<=(qc.length>=5?2:1))score=item.weight+30-d*10}if(score)scores.set(item.substanceId,Math.max(scores.get(item.substanceId)??0,score))}return [...substances].filter(x=>scores.has(x.id)).sort((a,b)=>(scores.get(b.id)!-scores.get(a.id)!)||a.name.localeCompare(b.name))}
+const normalize = (value: string) =>
+  value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+const compact = (v: string) => normalize(v).replaceAll(' ', '');
+const distance = (a: string, b: string) => {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0]!;
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const old = row[j]!;
+      row[j] = Math.min(row[j]! + 1, row[j - 1]! + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = old;
+    }
+  }
+  return row[b.length]!;
+};
+export function searchSubstances(substances: readonly Substance[], query: string): Substance[] {
+  const q = normalize(query),
+    qc = compact(query);
+  if (!q) return [];
+  const scores = new Map<string, number>();
+  for (const item of generated.searchIndex) {
+    let score = 0;
+    if (item.term === q || item.compact === qc) score = item.weight + 100;
+    else if (item.term.startsWith(q) || item.compact.startsWith(qc))
+      score = item.weight + 60 - q.length;
+    else {
+      const d = distance(qc, item.compact);
+      if (d <= (qc.length >= 5 ? 2 : 1)) score = item.weight + 30 - d * 10;
+    }
+    if (score) scores.set(item.substanceId, Math.max(scores.get(item.substanceId) ?? 0, score));
+  }
+  return [...substances]
+    .filter((x) => scores.has(x.id))
+    .sort((a, b) => scores.get(b.id)! - scores.get(a.id)! || a.name.localeCompare(b.name));
+}
