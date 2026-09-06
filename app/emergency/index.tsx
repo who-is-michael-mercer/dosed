@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 import { ScrollView, StyleSheet } from 'react-native';
 import content from '../../generated/content.json';
 import { contentRepository } from '../../src/infrastructure/content/LocalContentRepository';
-import { stableIdSchema } from '../../src/domain/content';
+import { substanceIdSchema } from '../../src/domain/content';
 import { colors, spacing } from '../../src/design/tokens';
 import { Action, AppText, Heading, Surface } from '../../src/components/ui';
 const Band = ({
@@ -30,7 +30,7 @@ const Band = ({
 );
 export default function Emergency() {
   const { substanceId } = useLocalSearchParams<{ substanceId?: string }>();
-  const parsed = stableIdSchema.safeParse(substanceId);
+  const parsed = substanceIdSchema.safeParse(substanceId);
   const substance = parsed.success ? contentRepository.getSubstance(parsed.data) : undefined;
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>

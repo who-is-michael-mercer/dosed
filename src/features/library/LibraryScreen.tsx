@@ -3,12 +3,17 @@ import { router, useFocusEffect } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { contentRepository } from '../../infrastructure/content/LocalContentRepository';
 import { recentRepository } from '../../infrastructure/persistence/RecentlyViewedRepository';
-import type { RecentEntry, StableId } from '../../domain/content';
+import { categoryIdSchema, type RecentEntry, type SubstanceId } from '../../domain/content';
 import { colors, spacing } from '../../design/tokens';
 import { AppText, Action, Heading } from '../../components/ui';
 import { SubstanceCard } from '../../components/SubstanceCard';
 import { EmergencyAccess } from '../../components/EmergencyAccess';
 const substances = contentRepository.listSubstances();
+const libraryCategoryIds = [
+  categoryIdSchema.parse('category.stimulant'),
+  categoryIdSchema.parse('category.dissociative'),
+  categoryIdSchema.parse('category.psychedelic'),
+];
 export function LibraryScreen() {
   const [mode, setMode] = useState<'category' | 'az'>('category');
   const [recent, setRecent] = useState<readonly RecentEntry[]>([]);
@@ -17,15 +22,12 @@ export function LibraryScreen() {
   }, []);
   useEffect(refresh, [refresh]);
   useFocusEffect(refresh);
-  const open = (id: StableId) =>
+  const open = (id: SubstanceId) =>
     router.push({ pathname: '/substance/[substanceId]', params: { substanceId: id } });
   const recentItems = recent
     .map((x) => contentRepository.getSubstance(x.substanceId))
     .filter((x) => x !== undefined);
-  const categories =
-    mode === 'category'
-      ? ['category.stimulant', 'category.dissociative', 'category.psychedelic']
-      : [];
+  const categories = mode === 'category' ? libraryCategoryIds : [];
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">

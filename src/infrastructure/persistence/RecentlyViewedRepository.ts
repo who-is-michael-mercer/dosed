@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { stableIdSchema, type RecentEntry, type RecentRepository } from '../../domain/content';
+import { recentEntrySchema, type RecentEntry, type RecentRepository } from '../../domain/content';
 export interface KeyValueStorage {
   getItem(key: string): Promise<string | null>;
   setItem(key: string, value: string): Promise<void>;
@@ -13,18 +13,9 @@ export class OnDeviceRecentlyViewedRepository implements RecentRepository {
     try {
       const raw = await this.storage.getItem(KEY);
       if (!raw) return [];
-      const parsed: unknown = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return [];
-      return parsed
-        .filter(
-          (x): x is RecentEntry =>
-            Boolean(x) &&
-            typeof x === 'object' &&
-            stableIdSchema.safeParse((x as RecentEntry).substanceId).success &&
-            Number.isFinite((x as RecentEntry).viewedAt),
-        )
-        .sort((a, b) => b.viewedAt - a.viewedAt)
-        .slice(0, RECENT_LIMIT);
+      const parsed = recentEntrySchema.array().safeParse(JSON.parse(raw));
+      if (!parsed.success) return [];
+      return parsed.data.sort((a, b) => b.viewedAt - a.viewedAt).slice(0, RECENT_LIMIT);
     } catch {
       return [];
     }

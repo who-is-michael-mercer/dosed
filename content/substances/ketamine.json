@@ -21,7 +21,7 @@
       "title": "Reduced awareness and breathing need attention",
       "body": "Heavy sedation, vomiting, and loss of coordination can become dangerous, especially with alcohol, opioids, or other depressants.",
       "action": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
-      "sourceIds": ["source.nhs.ketamine"]
+      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
     }
   ],
   "doseReferences": [
@@ -31,7 +31,7 @@
       "unit": "mg",
       "ranges": [{ "label": "reported range", "min": 15, "max": 75 }],
       "context": "A descriptive range is not a safe or recommended dose. Product identity, tolerance, technique, and individual response vary.",
-      "sourceIds": ["source.nhs.ketamine"]
+      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
     }
   ],
   "timelines": [
@@ -43,16 +43,28 @@
         { "label": "Main effects", "min": 30, "max": 60, "unit": "minutes" }
       ],
       "uncertainty": "Route, amount, tolerance, product contents, and combinations change timing.",
-      "sourceIds": ["source.nhs.ketamine"]
+      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
     }
   ],
   "effects": {
-    "common": ["Detachment, altered movement, time, sound, and body perception"],
-    "unwanted": ["Nausea, confusion, memory gaps, falls, and unconsciousness"],
-    "variability": ["Setting, tolerance, route, and combinations can substantially change effects"]
+    "common": {
+      "id": "effect.ketamine.common",
+      "items": ["Detachment, altered movement, time, sound, and body perception"]
+    },
+    "unwanted": {
+      "id": "effect.ketamine.unwanted",
+      "items": ["Nausea, confusion, memory gaps, falls, and unconsciousness"]
+    },
+    "variability": {
+      "id": "effect.ketamine.variability",
+      "items": ["Setting, tolerance, route, and combinations can substantially change effects"]
+    }
   },
   "helpSigns": [
-    "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+    {
+      "id": "sign.ketamine.unresponsive-breathing",
+      "body": "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+    }
   ],
-  "sourceIds": ["source.nhs.ketamine"]
+  "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
 }

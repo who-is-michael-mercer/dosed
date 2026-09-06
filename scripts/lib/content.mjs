@@ -1,8 +1,27 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { authoredContentSchema } from '../../src/domain/content.ts';
 
 export const ROOT = path.resolve(import.meta.dirname, '../..');
-export const readJson = (file) => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+export const CONTENT_SCHEMA_VERSION = 2;
+export const CONTENT_VERSION = '2026.09.06';
+export const compareCodePoints = (a, b) => {
+  const left = [...a];
+  const right = [...b];
+  for (let index = 0; index < Math.min(left.length, right.length); index += 1) {
+    const difference = left[index].codePointAt(0) - right[index].codePointAt(0);
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
+};
+export const readJson = (file) => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${file}: ${message}`, { cause: error });
+  }
+};
 export const normalize = (value) =>
   value
     .normalize('NFKD')
@@ -31,79 +50,143 @@ export function loadContent() {
   const emergency = readJson('content/emergency/core.json');
   const substances = fs
     .readdirSync(path.join(ROOT, 'content/substances'))
-    .sort()
+    .filter((file) => file.endsWith('.json'))
+    .sort(compareCodePoints)
     .map((file) => readJson(`content/substances/${file}`));
   return { categories, sources, emergency, substances };
 }
-const idPattern = /^[a-z]+(?:\.[a-z0-9][a-z0-9-]*)+$/;
-export function validateContent(content = loadContent()) {
-  const errors = [];
-  const ids = new Set();
-  const add = (ok, msg) => {
-    if (!ok) errors.push(msg);
-  };
-  const all = [...content.categories, ...content.sources, ...content.substances, content.emergency];
-  for (const item of all) {
-    add(typeof item.id === 'string' && idPattern.test(item.id), `invalid ID: ${item.id}`);
-    add(!ids.has(item.id), `duplicate ID: ${item.id}`);
-    ids.add(item.id);
+
+const formatPath = (pathParts) => pathParts.map(String).join('.') || 'content';
+const sortUnique = (values) => [...new Set(values)].sort(compareCodePoints);
+
+const walk = (value, pathParts, visit) => {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => walk(item, [...pathParts, index], visit));
+    return;
   }
-  const categoryIds = new Set(content.categories.map((x) => x.id));
-  const sourceIds = new Set(content.sources.map((x) => x.id));
-  const substanceIds = new Set(content.substances.map((x) => x.id));
+  if (value === null || typeof value !== 'object') return;
+  visit(value, pathParts);
+  for (const [key, child] of Object.entries(value)) walk(child, [...pathParts, key], visit);
+};
+
+const buildAmbiguousAliases = (substances) => {
   const aliases = new Map();
-  for (const s of content.substances) {
-    add(
-      s.review?.status && s.review?.reviewedAt && s.review?.reviewDue,
-      `${s.id}: missing review metadata`,
-    );
-    add(Array.isArray(s.sourceIds) && s.sourceIds.length > 0, `${s.id}: missing required sources`);
-    for (const id of s.categoryIds ?? [])
-      add(categoryIds.has(id), `${s.id}: broken category ${id}`);
-    for (const id of s.sourceIds ?? []) add(sourceIds.has(id), `${s.id}: broken source ${id}`);
-    for (const alias of s.aliases ?? []) {
+  for (const substance of substances) {
+    for (const alias of substance.aliases) {
       const key = normalize(alias.text);
-      const list = aliases.get(key) ?? [];
-      list.push(s.id);
-      aliases.set(key, list);
+      const matches = aliases.get(key) ?? [];
+      matches.push(substance.id);
+      aliases.set(key, matches);
     }
-    for (const claim of s.safetyClaims ?? []) {
-      add(
-        ['critical', 'important', 'context'].includes(claim.priority),
-        `${claim.id}: invalid safety priority`,
-      );
-      add(Boolean(claim.action), `${claim.id}: missing linked action`);
-      for (const id of claim.sourceIds ?? [])
-        add(sourceIds.has(id), `${claim.id}: broken source ${id}`);
-    }
-    for (const dose of s.doseReferences ?? []) {
-      for (const range of dose.ranges ?? [])
-        add(
-          Number.isFinite(range.min) && Number.isFinite(range.max) && range.min < range.max,
-          `${dose.id}: invalid dose range`,
-        );
-      add(['oral', 'insufflated'].includes(dose.route), `${dose.id}: invalid route`);
-      add((dose.sourceIds ?? []).length > 0, `${dose.id}: missing source`);
-    }
-    for (const relation of s.relationships ?? [])
-      add(
-        substanceIds.has(relation.substanceId),
-        `${s.id}: broken relationship ${relation.substanceId}`,
-      );
   }
-  add(
-    (content.emergency.expected?.length ?? 0) > 0 &&
-      content.emergency.payAttention?.length > 0 &&
-      content.emergency.getHelp?.length > 0,
-    'missing core emergency content',
-  );
+  return [...aliases]
+    .map(([alias, substanceIds]) => ({ alias, substanceIds: sortUnique(substanceIds) }))
+    .filter(({ substanceIds }) => substanceIds.length > 1)
+    .sort((a, b) => compareCodePoints(a.alias, b.alias));
+};
+
+export function validateContent(content = loadContent()) {
+  let parsed;
+  try {
+    parsed = authoredContentSchema.safeParse(content);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      errors: [`content: schema validation failed: ${message}`],
+      ambiguousAliases: [],
+    };
+  }
+  if (!parsed.success) {
+    return {
+      errors: sortUnique(
+        parsed.error.issues.map((issue) => `${formatPath(issue.path)}: ${issue.message}`),
+      ),
+      ambiguousAliases: [],
+    };
+  }
+
+  const validated = parsed.data;
+  const errors = [];
+  const categoryIds = new Set(validated.categories.map(({ id }) => id));
+  const sourceIds = new Set(validated.sources.map(({ id }) => id));
+  const substanceIds = new Set(validated.substances.map(({ id }) => id));
+  const ids = new Map();
+
+  walk(validated, [], (value, pathParts) => {
+    if (typeof value.id === 'string') {
+      const previousPath = ids.get(value.id);
+      if (previousPath !== undefined) {
+        errors.push(
+          `${formatPath([...pathParts, 'id'])}: duplicate ID ${value.id} (first at ${previousPath})`,
+        );
+      } else {
+        ids.set(value.id, formatPath([...pathParts, 'id']));
+      }
+    }
+
+    if (Array.isArray(value.categoryIds)) {
+      value.categoryIds.forEach((categoryId, index) => {
+        if (!categoryIds.has(categoryId)) {
+          errors.push(
+            `${formatPath([...pathParts, 'categoryIds', index])}: broken category ${categoryId}`,
+          );
+        }
+      });
+    }
+
+    if (typeof value.substanceId === 'string' && !substanceIds.has(value.substanceId)) {
+      errors.push(
+        `${formatPath([...pathParts, 'substanceId'])}: broken substance ${value.substanceId}`,
+      );
+    }
+
+    if (typeof value.sourceId === 'string' && !sourceIds.has(value.sourceId)) {
+      errors.push(`${formatPath([...pathParts, 'sourceId'])}: broken source ${value.sourceId}`);
+    }
+  });
+
+  validated.substances.forEach((substance, substanceIndex) => {
+    const substancePath = ['substances', substanceIndex];
+    const seenCategoryIds = new Set();
+    substance.categoryIds.forEach((categoryId, categoryIndex) => {
+      if (seenCategoryIds.has(categoryId)) {
+        errors.push(
+          `${formatPath([...substancePath, 'categoryIds', categoryIndex])}: duplicate category ${categoryId}`,
+        );
+      }
+      seenCategoryIds.add(categoryId);
+    });
+
+    for (const [relationshipIndex, relationship] of (substance.relationships ?? []).entries()) {
+      if (relationship.substanceId === substance.id) {
+        errors.push(
+          `${formatPath([...substancePath, 'relationships', relationshipIndex, 'substanceId'])}: self relationship ${substance.id}`,
+        );
+      }
+    }
+
+    const bibliographySourceIds = new Set(
+      substance.sourceReferences.map(({ sourceId }) => sourceId),
+    );
+    for (const [key, child] of Object.entries(substance)) {
+      if (key === 'sourceReferences') continue;
+      walk(child, [...substancePath, key], (value, pathParts) => {
+        if (typeof value.sourceId === 'string' && !bibliographySourceIds.has(value.sourceId)) {
+          errors.push(
+            `${formatPath([...pathParts, 'sourceId'])}: source ${value.sourceId} is missing from ${substance.id} bibliography`,
+          );
+        }
+      });
+    }
+  });
+
   return {
-    errors,
-    ambiguousAliases: [...aliases]
-      .filter(([, v]) => new Set(v).size > 1)
-      .map(([alias, substanceIds]) => ({ alias, substanceIds: [...new Set(substanceIds)].sort() })),
+    errors: sortUnique(errors),
+    ambiguousAliases: buildAmbiguousAliases(validated.substances),
+    content: validated,
   };
 }
+
 export function buildSearchIndex(substances) {
   return substances
     .flatMap((s) => [
@@ -131,11 +214,30 @@ export function buildSearchIndex(substances) {
     ])
     .sort(
       (a, b) =>
-        a.term.localeCompare(b.term) ||
-        a.substanceId.localeCompare(b.substanceId) ||
-        b.weight - a.weight,
+        compareCodePoints(a.term, b.term) ||
+        compareCodePoints(a.substanceId, b.substanceId) ||
+        b.weight - a.weight ||
+        compareCodePoints(a.kind, b.kind) ||
+        compareCodePoints(a.compact, b.compact),
     );
 }
+
+export function buildContentBundle(content) {
+  const validation = validateContent(content);
+  if (validation.errors.length > 0 || validation.content === undefined) {
+    throw new Error(validation.errors.join('\n'));
+  }
+  return {
+    schemaVersion: CONTENT_SCHEMA_VERSION,
+    contentVersion: CONTENT_VERSION,
+    ...validation.content,
+    searchIndex: buildSearchIndex(validation.content.substances),
+    ambiguousAliases: validation.ambiguousAliases,
+  };
+}
+
+export const serializeContentBundle = (bundle) => `${JSON.stringify(bundle, null, 2)}\n`;
+
 export function search(index, substances, query) {
   const q = normalize(query),
     qc = compact(query);
@@ -156,5 +258,5 @@ export function search(index, substances, query) {
   return [...scores]
     .map(([id, score]) => ({ substance: substances.find((s) => s.id === id), score }))
     .filter((x) => x.substance)
-    .sort((a, b) => b.score - a.score || a.substance.name.localeCompare(b.substance.name));
+    .sort((a, b) => b.score - a.score || compareCodePoints(a.substance.name, b.substance.name));
 }
