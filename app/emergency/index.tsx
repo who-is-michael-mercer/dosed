@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import * as Linking from 'expo-linking';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import content from '../../generated/content.json';
 import { contentRepository } from '../../src/infrastructure/content/LocalContentRepository';
 import { stableIdSchema } from '../../src/domain/content';

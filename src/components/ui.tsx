@@ -24,10 +24,10 @@ export function Action({ children, style, ...props }: PropsWithChildren<Pressabl
   return (
     <Pressable
       accessibilityRole="button"
-      style={({ pressed }) => [
+      style={(state) => [
         styles.action,
-        pressed && styles.pressed,
-        typeof style === 'function' ? style({ pressed }) : style,
+        state.pressed && styles.pressed,
+        typeof style === 'function' ? style(state) : style,
       ]}
       {...props}
     >

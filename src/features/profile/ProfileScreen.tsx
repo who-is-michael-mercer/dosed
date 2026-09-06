@@ -8,6 +8,39 @@ import { contentRepository } from '../../infrastructure/content/LocalContentRepo
 import { colors, spacing } from '../../design/tokens';
 import { AppText, Action, Heading, Surface } from '../../components/ui';
 import { EmergencyAccess } from '../../components/EmergencyAccess';
+
+type DoseReference = {
+  id: string;
+  route: string;
+  unit: string;
+  ranges: {
+    label: string;
+    min: number;
+    max: number;
+  }[];
+  context: string;
+  redosing?: string;
+};
+
+type Timeline = {
+  id: string;
+  route: string;
+  phases: {
+    label: string;
+    min: number;
+    max: number;
+    unit: string;
+  }[];
+  uncertainty: string;
+};
+
+type RabbitHoleEntry = {
+  level: string;
+  body: string;
+  certainty: string;
+  sourceIds: string[];
+};
+
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={styles.section}>
     <Heading>{title}</Heading>
@@ -26,6 +59,11 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
     const timer = setTimeout(() => void recordRecentlyViewed(recentRepository, substance.id), 750);
     return () => clearTimeout(timer);
   }, [substance.id]);
+
+  const doseReferences = substance.doseReferences as DoseReference[] | undefined;
+  const timelines = substance.timelines as Timeline[] | undefined;
+  const rabbitHole = substance.rabbitHole as RabbitHoleEntry[] | undefined;
+
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -54,14 +92,14 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             </Surface>
           ))}
         </Section>
-        {substance.doseReferences && (
+        {doseReferences && (
           <Section title="Before you take it">
-            {substance.doseReferences.map((d: any) => (
+            {doseReferences.map((d) => (
               <Surface key={d.id}>
                 <AppText style={styles.priority}>
                   {d.route.toUpperCase()} · DESCRIPTIVE REFERENCE
                 </AppText>
-                {d.ranges.map((r: any) => (
+                {d.ranges.map((r) => (
                   <AppText key={r.label}>
                     {r.label}: {r.min}–{r.max} {d.unit}
                   </AppText>
@@ -72,14 +110,14 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             ))}
           </Section>
         )}
-        {substance.timelines && (
+        {timelines && (
           <Section title="What to expect">
-            {substance.timelines.map((t: any) => (
+            {timelines.map((t) => (
               <Surface key={t.id}>
                 <AppText style={styles.priority}>
                   {t.route.toUpperCase()} · TYPICAL, NOT GUARANTEED
                 </AppText>
-                {t.phases.map((p: any) => (
+                {t.phases.map((p) => (
                   <AppText key={p.label}>
                     {p.label}: {p.min}–{p.max} {p.unit}
                   </AppText>
@@ -137,9 +175,9 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             })}
           </Section>
         )}
-        {substance.rabbitHole && (
+        {rabbitHole && (
           <Section title="Rabbit hole">
-            {substance.rabbitHole.map((r: any, i: number) => (
+            {rabbitHole.map((r, i) => (
               <Surface key={i}>
                 <AppText style={styles.priority}>
                   {r.level.toUpperCase()} · {r.certainty}
