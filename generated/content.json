@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09.04",
+  "categories": [
+    {
+      "id": "category.stimulant",
+      "label": "Stimulants",
+      "description": "Substances that tend to increase alertness and physiological activity.",
+      "order": 1,
+      "color": "coral"
+    },
+    {
+      "id": "category.dissociative",
+      "label": "Dissociatives",
+      "description": "Substances that can alter sensory integration and connection to surroundings.",
+      "order": 2,
+      "color": "blue"
+    },
+    {
+      "id": "category.psychedelic",
+      "label": "Psychedelics",
+      "description": "Substances that can substantially alter perception, thought, and mood.",
+      "order": 3,
+      "color": "violet"
+    }
+  ],
+  "sources": [
+    {
+      "id": "source.emcdda.mdma",
+      "title": "MDMA drug profile",
+      "organization": "EUDA",
+      "url": "https://www.euda.europa.eu/publications/drug-profiles/mdma_en",
+      "year": 2023
+    },
+    {
+      "id": "source.nida.mdma",
+      "title": "MDMA (Ecstasy/Molly) DrugFacts",
+      "organization": "NIDA",
+      "url": "https://nida.nih.gov/publications/drugfacts/mdma-ecstasymolly",
+      "year": 2024
+    },
+    {
+      "id": "source.nhs.ketamine",
+      "title": "Ketamine",
+      "organization": "NHS inform",
+      "url": "https://www.nhsinform.scot/healthy-living/drugs-and-drug-use/common-drugs/ketamine/",
+      "year": 2024
+    },
+    {
+      "id": "source.nida.hallucinogens",
+      "title": "Hallucinogens DrugFacts",
+      "organization": "NIDA",
+      "url": "https://nida.nih.gov/publications/drugfacts/hallucinogens",
+      "year": 2024
+    },
+    {
+      "id": "source.who.emergency",
+      "title": "Basic emergency care",
+      "organization": "World Health Organization",
+      "url": "https://www.who.int/publications/i/item/9789241513081",
+      "year": 2018
+    }
+  ],
+  "emergency": {
+    "id": "emergency.core",
+    "review": {
+      "status": "needs_clinical_review",
+      "reviewedAt": "2026-09-01",
+      "reviewDue": "2026-12-01"
+    },
+    "expected": [
+      "Stay with the person and keep checking how they respond.",
+      "Move somewhere calm and away from traffic, water, heights, or crowds."
+    ],
+    "payAttention": [
+      "Confusion, agitation, repeated vomiting, severe headache, or behavior that is rapidly changing.",
+      "Breathing that is unusual, very fast, very slow, noisy, or difficult."
+    ],
+    "getHelp": [
+      "Call emergency services now if they are unconscious, cannot be woken, have trouble breathing, have a seizure, collapse, or are dangerously hot.",
+      "Put an unconscious but breathing person on their side. If they are not breathing, begin CPR if you can.",
+      "Tell responders what may have been taken, when, and whether more than one substance may be involved. You will still get guidance if you do not know."
+    ],
+    "unknown": "You do not need to know the substance or dose. Treat observable signs and call for help when in doubt.",
+    "sourceIds": [
+      "source.who.emergency"
+    ]
+  },
+  "substances": [
+    {
+      "id": "substance.2cb",
+      "name": "2C-B",
+      "aliases": [
+        {
+          "text": "2CB",
+          "kind": "abbreviation",
+          "display": false
+        },
+        {
+          "text": "Nexus",
+          "kind": "slang",
+          "display": true
+        }
+      ],
+      "searchTerms": [
+        "2 c b"
+      ],
+      "categoryIds": [
+        "category.psychedelic"
+      ],
+      "visual": {
+        "symbol": "2B",
+        "color": "amber"
+      },
+      "identity": "A synthetic psychedelic phenethylamine with stimulant-like and perception-altering effects.",
+      "review": {
+        "status": "needs_clinical_review",
+        "reviewedAt": "2026-09-01",
+        "reviewDue": "2026-12-01"
+      },
+      "safetyClaims": [
+        {
+          "id": "claim.2cb.uncertainty",
+          "priority": "important",
+          "title": "Identity and potency may be uncertain",
+          "body": "Products sold as 2C-B can be misrepresented, and relatively small quantity differences may change intensity.",
+          "action": "Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.",
+          "sourceIds": [
+            "source.nida.hallucinogens"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "source.nida.hallucinogens"
+      ]
+    },
+    {
+      "id": "substance.ketamine",
+      "name": "Ketamine",
+      "aliases": [
+        {
+          "text": "Ket",
+          "kind": "slang",
+          "display": true
+        },
+        {
+          "text": "K",
+          "kind": "abbreviation",
+          "display": true
+        }
+      ],
+      "searchTerms": [],
+      "categoryIds": [
+        "category.dissociative"
+      ],
+      "visual": {
+        "symbol": "K",
+        "color": "blue"
+      },
+      "identity": "A dissociative anaesthetic that can alter perception, coordination, memory, and connection to the body and surroundings.",
+      "review": {
+        "status": "needs_clinical_review",
+        "reviewedAt": "2026-09-01",
+        "reviewDue": "2026-12-01"
+      },
+      "safetyClaims": [
+        {
+          "id": "claim.ketamine.sedation",
+          "priority": "critical",
+          "title": "Reduced awareness and breathing need attention",
+          "body": "Heavy sedation, vomiting, and loss of coordination can become dangerous, especially with alcohol, opioids, or other depressants.",
+          "action": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
+          "sourceIds": [
+            "source.nhs.ketamine"
+          ]
+        }
+      ],
+      "doseReferences": [
+        {
+          "id": "dose.ketamine.insufflated",
+          "route": "insufflated",
+          "unit": "mg",
+          "ranges": [
+            {
+              "label": "reported range",
+              "min": 15,
+              "max": 75
+            }
+          ],
+          "context": "A descriptive range is not a safe or recommended dose. Product identity, tolerance, technique, and individual response vary.",
+          "sourceIds": [
+            "source.nhs.ketamine"
+          ]
+        }
+      ],
+      "timelines": [
+        {
+          "id": "timeline.ketamine.insufflated",
+          "route": "insufflated",
+          "phases": [
+            {
+              "label": "Onset",
+              "min": 5,
+              "max": 15,
+              "unit": "minutes"
+            },
+            {
+              "label": "Main effects",
+              "min": 30,
+              "max": 60,
+              "unit": "minutes"
+            }
+          ],
+          "uncertainty": "Route, amount, tolerance, product contents, and combinations change timing.",
+          "sourceIds": [
+            "source.nhs.ketamine"
+          ]
+        }
+      ],
+      "effects": {
+        "common": [
+          "Detachment, altered movement, time, sound, and body perception"
+        ],
+        "unwanted": [
+          "Nausea, confusion, memory gaps, falls, and unconsciousness"
+        ],
+        "variability": [
+          "Setting, tolerance, route, and combinations can substantially change effects"
+        ]
+      },
+      "helpSigns": [
+        "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+      ],
+      "sourceIds": [
+        "source.nhs.ketamine"
+      ]
+    },
+    {
+      "id": "substance.mdma",
+      "name": "MDMA",
+      "aliases": [
+        {
+          "text": "Molly",
+          "kind": "slang",
+          "display": true
+        },
+        {
+          "text": "Ecstasy",
+          "kind": "common",
+          "display": true
+        },
+        {
+          "text": "3,4-methylenedioxymethamphetamine",
+          "kind": "chemical",
+          "display": true
+        }
+      ],
+      "searchTerms": [
+        "mandy"
+      ],
+      "categoryIds": [
+        "category.stimulant",
+        "category.psychedelic"
+      ],
+      "visual": {
+        "symbol": "M",
+        "color": "coral"
+      },
+      "identity": "A synthetic psychoactive substance with stimulant and perception-altering effects, often associated with increased sociability and emotional openness.",
+      "review": {
+        "status": "needs_clinical_review",
+        "reviewedAt": "2026-09-01",
+        "reviewDue": "2026-12-01"
+      },
+      "safetyClaims": [
+        {
+          "id": "claim.mdma.temperature",
+          "priority": "critical",
+          "title": "Dangerous overheating can happen",
+          "body": "Hot environments, sustained exertion, and other substances can increase strain. A person who is very hot, confused, collapses, or has a seizure needs emergency help.",
+          "action": "Stop exertion, move to a cooler place, stay together, and call emergency services for severe signs.",
+          "sourceIds": [
+            "source.nida.mdma"
+          ]
+        },
+        {
+          "id": "claim.mdma.interactions",
+          "priority": "important",
+          "title": "Interactions can be serious",
+          "body": "Some medicines and substances can add serotonergic, cardiovascular, or overheating risk. The contents of products sold as MDMA are also uncertain.",
+          "action": "Avoid mixing; seek qualified medication advice rather than stopping prescribed medication yourself.",
+          "sourceIds": [
+            "source.nida.mdma"
+          ]
+        }
+      ],
+      "doseReferences": [
+        {
+          "id": "dose.mdma.oral",
+          "route": "oral",
+          "unit": "mg",
+          "ranges": [
+            {
+              "label": "lower reported range",
+              "min": 40,
+              "max": 75
+            },
+            {
+              "label": "common reported range",
+              "min": 75,
+              "max": 125
+            }
+          ],
+          "context": "Descriptive published/observed ranges are not a safe or recommended dose. Potency, contents, body, medicines, setting, and individual response vary.",
+          "redosing": "Effects can still be developing when someone considers taking more. Repeated dosing increases cumulative exposure and can prolong unwanted effects.",
+          "sourceIds": [
+            "source.emcdda.mdma"
+          ]
+        }
+      ],
+      "timelines": [
+        {
+          "id": "timeline.mdma.oral",
+          "route": "oral",
+          "phases": [
+            {
+              "label": "Onset",
+              "min": 20,
+              "max": 60,
+              "unit": "minutes"
+            },
+            {
+              "label": "Main effects",
+              "min": 3,
+              "max": 6,
+              "unit": "hours"
+            },
+            {
+              "label": "After-effects",
+              "min": 1,
+              "max": 2,
+              "unit": "days"
+            }
+          ],
+          "uncertainty": "Food, contents, dose, metabolism, medicines, redosing, and other substances can shift these ranges.",
+          "sourceIds": [
+            "source.emcdda.mdma"
+          ]
+        }
+      ],
+      "effects": {
+        "common": [
+          "Increased energy, sociability, sensory intensity, and emotional openness",
+          "Faster heart rate, jaw tension, sweating, and reduced appetite"
+        ],
+        "unwanted": [
+          "Anxiety, nausea, overheating, confusion, insomnia, and low mood afterward"
+        ],
+        "variability": [
+          "Contents and potency are not knowable from appearance",
+          "Environment, exertion, hydration, health, medicines, and combinations matter"
+        ]
+      },
+      "testing": {
+        "summary": "A reagent reaction can be consistent with the presence of MDMA; it does not confirm identity, purity, dose, or rule out additional substances.",
+        "reactions": [
+          "Marquis: a rapid dark purple-to-black reaction is reported as consistent with an MDxx-type substance, not confirmation of MDMA."
+        ],
+        "limitations": "Use more than one appropriate reagent and compare against current instructions. Laboratory analysis offers stronger identification where available.",
+        "sourceIds": [
+          "source.emcdda.mdma"
+        ]
+      },
+      "helpSigns": [
+        "Very high body temperature or hot skin with confusion",
+        "Collapse, seizure, severe agitation, chest pain, or difficulty breathing"
+      ],
+      "relationships": [
+        {
+          "substanceId": "substance.ketamine",
+          "reason": "Sometimes encountered in the same settings; combined stimulant and dissociative effects can make impairment and warning signs harder to interpret."
+        },
+        {
+          "substanceId": "substance.2cb",
+          "reason": "Both may be sold in tablet or powder form and can be misrepresented; their effects and risk contexts are not interchangeable."
+        }
+      ],
+      "rabbitHole": [
+        {
+          "level": "plain",
+          "body": "MDMA increases signaling involving serotonin, norepinephrine, and dopamine. Serotonin-related effects are prominent, but no single transmitter explains the whole experience.",
+          "certainty": "established",
+          "sourceIds": [
+            "source.nida.mdma"
+          ]
+        },
+        {
+          "level": "deep",
+          "body": "MDMA reverses monoamine transporter flow and affects neuroendocrine systems. Human experience depends on dose, context, expectations, and uncertain product contents, so mechanism is not a prediction of an individual's response.",
+          "certainty": "inference",
+          "sourceIds": [
+            "source.emcdda.mdma"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "source.emcdda.mdma",
+        "source.nida.mdma"
+      ]
+    },
+    {
+      "id": "substance.psilocybin-mushrooms",
+      "name": "Psilocybin mushrooms",
+      "aliases": [
+        {
+          "text": "Magic mushrooms",
+          "kind": "common",
+          "display": true
+        },
+        {
+          "text": "Shrooms",
+          "kind": "slang",
+          "display": true
+        }
+      ],
+      "searchTerms": [
+        "psilocybin"
+      ],
+      "categoryIds": [
+        "category.psychedelic"
+      ],
+      "visual": {
+        "symbol": "Ψ",
+        "color": "violet"
+      },
+      "identity": "Fungi containing psilocybin whose potency and effects vary by species, specimen, preparation, person, and setting.",
+      "review": {
+        "status": "needs_clinical_review",
+        "reviewedAt": "2026-09-01",
+        "reviewDue": "2026-12-01"
+      },
+      "safetyClaims": [
+        {
+          "id": "claim.mushrooms.identity",
+          "priority": "critical",
+          "title": "Mushroom identification errors can be dangerous",
+          "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
+          "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
+          "sourceIds": [
+            "source.nida.hallucinogens"
+          ]
+        },
+        {
+          "id": "claim.mushrooms.context",
+          "priority": "important",
+          "title": "Distress and unsafe behavior can occur",
+          "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
+          "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
+          "sourceIds": [
+            "source.nida.hallucinogens"
+          ]
+        }
+      ],
+      "timelines": [
+        {
+          "id": "timeline.mushrooms.oral",
+          "route": "oral",
+          "phases": [
+            {
+              "label": "Onset",
+              "min": 20,
+              "max": 60,
+              "unit": "minutes"
+            },
+            {
+              "label": "Main effects",
+              "min": 4,
+              "max": 6,
+              "unit": "hours"
+            }
+          ],
+          "uncertainty": "Species, specimen, preparation, food, amount, person, and setting can shift timing and intensity.",
+          "sourceIds": [
+            "source.nida.hallucinogens"
+          ]
+        }
+      ],
+      "effects": {
+        "common": [
+          "Changes in perception, time, emotion, and thought"
+        ],
+        "unwanted": [
+          "Anxiety, panic, confusion, nausea, and impaired judgment"
+        ],
+        "variability": [
+          "Natural material can vary substantially even within one batch"
+        ]
+      },
+      "helpSigns": [
+        "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+      ],
+      "sourceIds": [
+        "source.nida.hallucinogens"
+      ]
+    }
+  ],
+  "searchIndex": [
+    {
+      "substanceId": "substance.2cb",
+      "term": "2 c b",
+      "compact": "2cb",
+      "kind": "curated",
+      "weight": 60
+    },
+    {
+      "substanceId": "substance.2cb",
+      "term": "2c b",
+      "compact": "2cb",
+      "kind": "name",
+      "weight": 100
+    },
+    {
+      "substanceId": "substance.2cb",
+      "term": "2cb",
+      "compact": "2cb",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.mdma",
+      "term": "3 4 methylenedioxymethamphetamine",
+      "compact": "34methylenedioxymethamphetamine",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.mdma",
+      "term": "ecstasy",
+      "compact": "ecstasy",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.ketamine",
+      "term": "k",
+      "compact": "k",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.ketamine",
+      "term": "ket",
+      "compact": "ket",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.ketamine",
+      "term": "ketamine",
+      "compact": "ketamine",
+      "kind": "name",
+      "weight": 100
+    },
+    {
+      "substanceId": "substance.psilocybin-mushrooms",
+      "term": "magic mushrooms",
+      "compact": "magicmushrooms",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.mdma",
+      "term": "mandy",
+      "compact": "mandy",
+      "kind": "curated",
+      "weight": 60
+    },
+    {
+      "substanceId": "substance.mdma",
+      "term": "mdma",
+      "compact": "mdma",
+      "kind": "name",
+      "weight": 100
+    },
+    {
+      "substanceId": "substance.mdma",
+      "term": "molly",
+      "compact": "molly",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.2cb",
+      "term": "nexus",
+      "compact": "nexus",
+      "kind": "alias",
+      "weight": 80
+    },
+    {
+      "substanceId": "substance.psilocybin-mushrooms",
+      "term": "psilocybin",
+      "compact": "psilocybin",
+      "kind": "curated",
+      "weight": 60
+    },
+    {
+      "substanceId": "substance.psilocybin-mushrooms",
+      "term": "psilocybin mushrooms",
+      "compact": "psilocybinmushrooms",
+      "kind": "name",
+      "weight": 100
+    },
+    {
+      "substanceId": "substance.psilocybin-mushrooms",
+      "term": "shrooms",
+      "compact": "shrooms",
+      "kind": "alias",
+      "weight": 80
+    }
+  ],
+  "ambiguousAliases": []
+}

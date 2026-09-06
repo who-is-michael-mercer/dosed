@@ -1,0 +1,13 @@
+appId: app.dosed.reference
+---
+- launchApp
+- tapOn: Search substances
+- tapOn: Search substances
+- inputText: molly
+- tapOn: Open MDMA profile
+- assertVisible: First, the important bits
+- tapOn: Something feels wrong? Open emergency guidance
+- assertVisible: Get emergency help
+- back
+- back
+- assertVisible: Recently viewed

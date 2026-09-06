@@ -1,0 +1,56 @@
+{
+  "id": "substance.psilocybin-mushrooms",
+  "name": "Psilocybin mushrooms",
+  "aliases": [
+    { "text": "Magic mushrooms", "kind": "common", "display": true },
+    { "text": "Shrooms", "kind": "slang", "display": true }
+  ],
+  "searchTerms": ["psilocybin"],
+  "categoryIds": ["category.psychedelic"],
+  "visual": { "symbol": "Ψ", "color": "violet" },
+  "identity": "Fungi containing psilocybin whose potency and effects vary by species, specimen, preparation, person, and setting.",
+  "review": {
+    "status": "needs_clinical_review",
+    "reviewedAt": "2026-09-01",
+    "reviewDue": "2026-12-01"
+  },
+  "safetyClaims": [
+    {
+      "id": "claim.mushrooms.identity",
+      "priority": "critical",
+      "title": "Mushroom identification errors can be dangerous",
+      "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
+      "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
+      "sourceIds": ["source.nida.hallucinogens"]
+    },
+    {
+      "id": "claim.mushrooms.context",
+      "priority": "important",
+      "title": "Distress and unsafe behavior can occur",
+      "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
+      "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
+      "sourceIds": ["source.nida.hallucinogens"]
+    }
+  ],
+  "timelines": [
+    {
+      "id": "timeline.mushrooms.oral",
+      "route": "oral",
+      "phases": [
+        { "label": "Onset", "min": 20, "max": 60, "unit": "minutes" },
+        { "label": "Main effects", "min": 4, "max": 6, "unit": "hours" }
+      ],
+      "uncertainty": "Species, specimen, preparation, food, amount, person, and setting can shift timing and intensity.",
+      "sourceIds": ["source.nida.hallucinogens"]
+    }
+  ],
+  "effects": {
+    "common": ["Changes in perception, time, emotion, and thought"],
+    "unwanted": ["Anxiety, panic, confusion, nausea, and impaired judgment"],
+    "variability": ["Natural material can vary substantially even within one batch"]
+  },
+  "helpSigns": [
+    "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+  ],
+  "sourceIds": ["source.nida.hallucinogens"]
+}

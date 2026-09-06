@@ -1,0 +1,111 @@
+{
+  "id": "substance.mdma",
+  "name": "MDMA",
+  "aliases": [
+    { "text": "Molly", "kind": "slang", "display": true },
+    { "text": "Ecstasy", "kind": "common", "display": true },
+    { "text": "3,4-methylenedioxymethamphetamine", "kind": "chemical", "display": true }
+  ],
+  "searchTerms": ["mandy"],
+  "categoryIds": ["category.stimulant", "category.psychedelic"],
+  "visual": { "symbol": "M", "color": "coral" },
+  "identity": "A synthetic psychoactive substance with stimulant and perception-altering effects, often associated with increased sociability and emotional openness.",
+  "review": {
+    "status": "needs_clinical_review",
+    "reviewedAt": "2026-09-01",
+    "reviewDue": "2026-12-01"
+  },
+  "safetyClaims": [
+    {
+      "id": "claim.mdma.temperature",
+      "priority": "critical",
+      "title": "Dangerous overheating can happen",
+      "body": "Hot environments, sustained exertion, and other substances can increase strain. A person who is very hot, confused, collapses, or has a seizure needs emergency help.",
+      "action": "Stop exertion, move to a cooler place, stay together, and call emergency services for severe signs.",
+      "sourceIds": ["source.nida.mdma"]
+    },
+    {
+      "id": "claim.mdma.interactions",
+      "priority": "important",
+      "title": "Interactions can be serious",
+      "body": "Some medicines and substances can add serotonergic, cardiovascular, or overheating risk. The contents of products sold as MDMA are also uncertain.",
+      "action": "Avoid mixing; seek qualified medication advice rather than stopping prescribed medication yourself.",
+      "sourceIds": ["source.nida.mdma"]
+    }
+  ],
+  "doseReferences": [
+    {
+      "id": "dose.mdma.oral",
+      "route": "oral",
+      "unit": "mg",
+      "ranges": [
+        { "label": "lower reported range", "min": 40, "max": 75 },
+        { "label": "common reported range", "min": 75, "max": 125 }
+      ],
+      "context": "Descriptive published/observed ranges are not a safe or recommended dose. Potency, contents, body, medicines, setting, and individual response vary.",
+      "redosing": "Effects can still be developing when someone considers taking more. Repeated dosing increases cumulative exposure and can prolong unwanted effects.",
+      "sourceIds": ["source.emcdda.mdma"]
+    }
+  ],
+  "timelines": [
+    {
+      "id": "timeline.mdma.oral",
+      "route": "oral",
+      "phases": [
+        { "label": "Onset", "min": 20, "max": 60, "unit": "minutes" },
+        { "label": "Main effects", "min": 3, "max": 6, "unit": "hours" },
+        { "label": "After-effects", "min": 1, "max": 2, "unit": "days" }
+      ],
+      "uncertainty": "Food, contents, dose, metabolism, medicines, redosing, and other substances can shift these ranges.",
+      "sourceIds": ["source.emcdda.mdma"]
+    }
+  ],
+  "effects": {
+    "common": [
+      "Increased energy, sociability, sensory intensity, and emotional openness",
+      "Faster heart rate, jaw tension, sweating, and reduced appetite"
+    ],
+    "unwanted": ["Anxiety, nausea, overheating, confusion, insomnia, and low mood afterward"],
+    "variability": [
+      "Contents and potency are not knowable from appearance",
+      "Environment, exertion, hydration, health, medicines, and combinations matter"
+    ]
+  },
+  "testing": {
+    "summary": "A reagent reaction can be consistent with the presence of MDMA; it does not confirm identity, purity, dose, or rule out additional substances.",
+    "reactions": [
+      "Marquis: a rapid dark purple-to-black reaction is reported as consistent with an MDxx-type substance, not confirmation of MDMA."
+    ],
+    "limitations": "Use more than one appropriate reagent and compare against current instructions. Laboratory analysis offers stronger identification where available.",
+    "sourceIds": ["source.emcdda.mdma"]
+  },
+  "helpSigns": [
+    "Very high body temperature or hot skin with confusion",
+    "Collapse, seizure, severe agitation, chest pain, or difficulty breathing"
+  ],
+  "relationships": [
+    {
+      "substanceId": "substance.ketamine",
+      "reason": "Sometimes encountered in the same settings; combined stimulant and dissociative effects can make impairment and warning signs harder to interpret."
+    },
+    {
+      "substanceId": "substance.2cb",
+      "reason": "Both may be sold in tablet or powder form and can be misrepresented; their effects and risk contexts are not interchangeable."
+    }
+  ],
+  "rabbitHole": [
+    {
+      "level": "plain",
+      "body": "MDMA increases signaling involving serotonin, norepinephrine, and dopamine. Serotonin-related effects are prominent, but no single transmitter explains the whole experience.",
+      "certainty": "established",
+      "sourceIds": ["source.nida.mdma"]
+    },
+    {
+      "level": "deep",
+      "body": "MDMA reverses monoamine transporter flow and affects neuroendocrine systems. Human experience depends on dose, context, expectations, and uncertain product contents, so mechanism is not a prediction of an individual's response.",
+      "certainty": "inference",
+      "sourceIds": ["source.emcdda.mdma"]
+    }
+  ],
+  "sourceIds": ["source.emcdda.mdma", "source.nida.mdma"]
+}

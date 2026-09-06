@@ -1,0 +1,23 @@
+{
+  "id": "emergency.core",
+  "review": {
+    "status": "needs_clinical_review",
+    "reviewedAt": "2026-09-01",
+    "reviewDue": "2026-12-01"
+  },
+  "expected": [
+    "Stay with the person and keep checking how they respond.",
+    "Move somewhere calm and away from traffic, water, heights, or crowds."
+  ],
+  "payAttention": [
+    "Confusion, agitation, repeated vomiting, severe headache, or behavior that is rapidly changing.",
+    "Breathing that is unusual, very fast, very slow, noisy, or difficult."
+  ],
+  "getHelp": [
+    "Call emergency services now if they are unconscious, cannot be woken, have trouble breathing, have a seizure, collapse, or are dangerously hot.",
+    "Put an unconscious but breathing person on their side. If they are not breathing, begin CPR if you can.",
+    "Tell responders what may have been taken, when, and whether more than one substance may be involved. You will still get guidance if you do not know."
+  ],
+  "unknown": "You do not need to know the substance or dose. Treat observable signs and call for help when in doubt.",
+  "sourceIds": ["source.who.emergency"]
+}
