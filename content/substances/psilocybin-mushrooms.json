@@ -21,7 +21,7 @@
       "title": "Mushroom identification errors can be dangerous",
       "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
       "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
-      "sourceIds": ["source.nida.hallucinogens"]
+      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
     },
     {
       "id": "claim.mushrooms.context",
@@ -29,7 +29,7 @@
       "title": "Distress and unsafe behavior can occur",
       "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
       "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
-      "sourceIds": ["source.nida.hallucinogens"]
+      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
     }
   ],
   "timelines": [
@@ -41,16 +41,28 @@
         { "label": "Main effects", "min": 4, "max": 6, "unit": "hours" }
       ],
       "uncertainty": "Species, specimen, preparation, food, amount, person, and setting can shift timing and intensity.",
-      "sourceIds": ["source.nida.hallucinogens"]
+      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
     }
   ],
   "effects": {
-    "common": ["Changes in perception, time, emotion, and thought"],
-    "unwanted": ["Anxiety, panic, confusion, nausea, and impaired judgment"],
-    "variability": ["Natural material can vary substantially even within one batch"]
+    "common": {
+      "id": "effect.psilocybin-mushrooms.common",
+      "items": ["Changes in perception, time, emotion, and thought"]
+    },
+    "unwanted": {
+      "id": "effect.psilocybin-mushrooms.unwanted",
+      "items": ["Anxiety, panic, confusion, nausea, and impaired judgment"]
+    },
+    "variability": {
+      "id": "effect.psilocybin-mushrooms.variability",
+      "items": ["Natural material can vary substantially even within one batch"]
+    }
   },
   "helpSigns": [
-    "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+    {
+      "id": "sign.psilocybin-mushrooms.severe-signs",
+      "body": "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+    }
   ],
-  "sourceIds": ["source.nida.hallucinogens"]
+  "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
 }

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import type { StableId, Substance } from '../../domain/content';
+import type { Substance } from '../../domain/content';
 import { recordRecentlyViewed } from '../../application/recent/recordRecentlyViewed';
 import { recentRepository } from '../../infrastructure/persistence/RecentlyViewedRepository';
 import { contentRepository } from '../../infrastructure/content/LocalContentRepository';
@@ -9,45 +9,13 @@ import { colors, spacing } from '../../design/tokens';
 import { AppText, Action, Heading, Surface } from '../../components/ui';
 import { EmergencyAccess } from '../../components/EmergencyAccess';
 
-type DoseReference = {
-  id: string;
-  route: string;
-  unit: string;
-  ranges: {
-    label: string;
-    min: number;
-    max: number;
-  }[];
-  context: string;
-  redosing?: string;
-};
-
-type Timeline = {
-  id: string;
-  route: string;
-  phases: {
-    label: string;
-    min: number;
-    max: number;
-    unit: string;
-  }[];
-  uncertainty: string;
-};
-
-type RabbitHoleEntry = {
-  level: string;
-  body: string;
-  certainty: string;
-  sourceIds: string[];
-};
-
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={styles.section}>
     <Heading>{title}</Heading>
     {children}
   </View>
 );
-const Lines = ({ items }: { items: string[] }) => (
+const Lines = ({ items }: { items: readonly string[] }) => (
   <>
     {items.map((x) => (
       <AppText key={x}>• {x}</AppText>
@@ -59,10 +27,6 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
     const timer = setTimeout(() => void recordRecentlyViewed(recentRepository, substance.id), 750);
     return () => clearTimeout(timer);
   }, [substance.id]);
-
-  const doseReferences = substance.doseReferences as DoseReference[] | undefined;
-  const timelines = substance.timelines as Timeline[] | undefined;
-  const rabbitHole = substance.rabbitHole as RabbitHoleEntry[] | undefined;
 
   return (
     <View style={styles.page}>
@@ -80,10 +44,7 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
         <AppText>{substance.identity}</AppText>
         <Section title="First, the important bits">
           {substance.safetyClaims.map((c) => (
-            <Surface
-              key={c.id}
-              style={c.priority === 'critical' ? styles.critical : styles.important}
-            >
+            <Surface key={c.id} style={styles[c.priority]}>
               <AppText style={styles.priority}>
                 {c.priority.toUpperCase()} — {c.title}
               </AppText>
@@ -92,9 +53,9 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             </Surface>
           ))}
         </Section>
-        {doseReferences && (
+        {substance.doseReferences && (
           <Section title="Before you take it">
-            {doseReferences.map((d) => (
+            {substance.doseReferences.map((d) => (
               <Surface key={d.id}>
                 <AppText style={styles.priority}>
                   {d.route.toUpperCase()} · DESCRIPTIVE REFERENCE
@@ -110,9 +71,9 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             ))}
           </Section>
         )}
-        {timelines && (
+        {substance.timelines && (
           <Section title="What to expect">
-            {timelines.map((t) => (
+            {substance.timelines.map((t) => (
               <Surface key={t.id}>
                 <AppText style={styles.priority}>
                   {t.route.toUpperCase()} · TYPICAL, NOT GUARANTEED
@@ -125,18 +86,17 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
                 <AppText>{t.uncertainty}</AppText>
               </Surface>
             ))}
-            {substance.effects && (
-              <>
-                <Heading>Effects and variability</Heading>
-                <Lines
-                  items={[
-                    ...substance.effects.common,
-                    ...substance.effects.unwanted,
-                    ...substance.effects.variability,
-                  ]}
-                />
-              </>
-            )}
+          </Section>
+        )}
+        {substance.effects && (
+          <Section title="Effects and variability">
+            <Lines
+              items={[
+                ...(substance.effects.common?.items ?? []),
+                ...(substance.effects.unwanted?.items ?? []),
+                ...(substance.effects.variability?.items ?? []),
+              ]}
+            />
           </Section>
         )}
         {substance.testing && (
@@ -148,16 +108,18 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
         )}
         {substance.helpSigns && (
           <Section title="When to get help">
-            <Lines items={substance.helpSigns} />
+            {substance.helpSigns.map((sign) => (
+              <AppText key={sign.id}>• {sign.body}</AppText>
+            ))}
             <EmergencyAccess substanceId={substance.id} />
           </Section>
         )}
         {substance.relationships && (
           <Section title="Relationships">
             {substance.relationships.map((r) => {
-              const target = contentRepository.getSubstance(r.substanceId as StableId);
+              const target = contentRepository.getSubstance(r.substanceId);
               return target ? (
-                <Surface key={r.substanceId}>
+                <Surface key={r.id}>
                   <Heading>{target.name}</Heading>
                   <AppText>{r.reason}</AppText>
                   <Action
@@ -175,25 +137,23 @@ export function ProfileScreen({ substance }: { substance: Substance }) {
             })}
           </Section>
         )}
-        {rabbitHole && (
+        {substance.rabbitHole && (
           <Section title="Rabbit hole">
-            {rabbitHole.map((r, i) => (
-              <Surface key={i}>
+            {substance.rabbitHole.map((r) => (
+              <Surface key={r.id}>
                 <AppText style={styles.priority}>
                   {r.level.toUpperCase()} · {r.certainty}
                 </AppText>
                 <AppText>{r.body}</AppText>
-                <AppText style={styles.sources}>Sources: {r.sourceIds.join(', ')}</AppText>
               </Surface>
             ))}
           </Section>
         )}
-        <Section title="Evidence and review">
+        <Section title="Content review">
           <AppText>Status: {substance.review.status.replaceAll('_', ' ')}</AppText>
           <AppText>
-            Reviewed: {substance.review.reviewedAt} · due {substance.review.reviewDue}
+            Review recorded: {substance.review.reviewedAt} · due {substance.review.reviewDue}
           </AppText>
-          <AppText style={styles.sources}>Source IDs: {substance.sourceIds.join(', ')}</AppText>
         </Section>
       </ScrollView>
       <View style={styles.global}>
@@ -211,8 +171,8 @@ const styles = StyleSheet.create({
   section: { gap: spacing.md },
   critical: { borderLeftWidth: 5, borderLeftColor: colors.critical, gap: spacing.sm },
   important: { borderLeftWidth: 5, borderLeftColor: colors.important, gap: spacing.sm },
+  context: { borderLeftWidth: 5, borderLeftColor: colors.muted, gap: spacing.sm },
   priority: { fontWeight: '800' },
   action: { fontWeight: '700' },
-  sources: { color: colors.muted, fontSize: 14 },
   global: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: spacing.md },
 });

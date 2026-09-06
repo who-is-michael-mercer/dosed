@@ -1,17 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, buildSearchIndex, loadContent, validateContent } from './lib/content.mjs';
-const content = loadContent();
-const validation = validateContent(content);
-if (validation.errors.length) throw new Error(validation.errors.join('\n'));
-const bundle = {
-  schemaVersion: 1,
-  contentVersion: '2026.09.04',
-  ...content,
-  searchIndex: buildSearchIndex(content.substances),
-  ambiguousAliases: validation.ambiguousAliases,
-};
-const json = JSON.stringify(bundle, null, 2) + '\n';
+import { ROOT, buildContentBundle, loadContent, serializeContentBundle } from './lib/content.mjs';
+
+const json = serializeContentBundle(buildContentBundle(loadContent()));
 fs.mkdirSync(path.join(ROOT, 'generated'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'generated/content.json'), json);
 fs.writeFileSync(

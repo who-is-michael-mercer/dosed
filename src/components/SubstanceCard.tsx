@@ -19,12 +19,7 @@ export function SubstanceCard({
       onPress={onPress}
       style={styles.card}
     >
-      <View
-        style={[
-          styles.art,
-          { borderColor: colors[substance.visual.color as keyof typeof colors] ?? colors.muted },
-        ]}
-      >
+      <View style={[styles.art, { borderColor: colors[substance.visual.color] }]}>
         <AppText style={styles.symbol}>{substance.visual.symbol}</AppText>
       </View>
       <View style={styles.copy}>
@@ -40,12 +35,8 @@ export function SubstanceCard({
             </AppText>
             <AppText>{substance.identity}</AppText>
             {flags.map((flag) => (
-              <AppText
-                key={flag.id}
-                style={flag.priority === 'critical' ? styles.critical : styles.flag}
-              >
-                {flag.priority === 'critical' ? 'CRITICAL — ' : 'IMPORTANT — '}
-                {flag.title}
+              <AppText key={flag.id} style={styles[flag.priority]}>
+                {flag.priority.toUpperCase()} — {flag.title}
               </AppText>
             ))}
           </>
@@ -77,6 +68,7 @@ const styles = StyleSheet.create({
   symbol: { fontSize: 23, fontWeight: '800' },
   copy: { flex: 1, gap: spacing.sm },
   aliases: { color: colors.muted },
-  flag: { color: colors.important, fontWeight: '700' },
+  context: { color: colors.muted, fontWeight: '700' },
+  important: { color: colors.important, fontWeight: '700' },
   critical: { color: colors.critical, fontWeight: '800' },
 });

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "contentVersion": "2026.09.04",
+  "schemaVersion": 2,
+  "contentVersion": "2026.09.06",
   "categories": [
     {
       "id": "category.stimulant",
@@ -29,36 +29,36 @@
       "id": "source.emcdda.mdma",
       "title": "MDMA drug profile",
       "organization": "EUDA",
-      "url": "https://www.euda.europa.eu/publications/drug-profiles/mdma_en",
-      "year": 2023
+      "year": 2023,
+      "url": "https://www.euda.europa.eu/publications/drug-profiles/mdma_en"
     },
     {
       "id": "source.nida.mdma",
       "title": "MDMA (Ecstasy/Molly) DrugFacts",
       "organization": "NIDA",
-      "url": "https://nida.nih.gov/publications/drugfacts/mdma-ecstasymolly",
-      "year": 2024
+      "year": 2024,
+      "url": "https://nida.nih.gov/publications/drugfacts/mdma-ecstasymolly"
     },
     {
       "id": "source.nhs.ketamine",
       "title": "Ketamine",
       "organization": "NHS inform",
-      "url": "https://www.nhsinform.scot/healthy-living/drugs-and-drug-use/common-drugs/ketamine/",
-      "year": 2024
+      "year": 2024,
+      "url": "https://www.nhsinform.scot/healthy-living/drugs-and-drug-use/common-drugs/ketamine/"
     },
     {
       "id": "source.nida.hallucinogens",
       "title": "Hallucinogens DrugFacts",
       "organization": "NIDA",
-      "url": "https://nida.nih.gov/publications/drugfacts/hallucinogens",
-      "year": 2024
+      "year": 2024,
+      "url": "https://nida.nih.gov/publications/drugfacts/hallucinogens"
     },
     {
       "id": "source.who.emergency",
       "title": "Basic emergency care",
       "organization": "World Health Organization",
-      "url": "https://www.who.int/publications/i/item/9789241513081",
-      "year": 2018
+      "year": 2018,
+      "url": "https://www.who.int/publications/i/item/9789241513081"
     }
   ],
   "emergency": {
@@ -82,8 +82,10 @@
       "Tell responders what may have been taken, when, and whether more than one substance may be involved. You will still get guidance if you do not know."
     ],
     "unknown": "You do not need to know the substance or dose. Treat observable signs and call for help when in doubt.",
-    "sourceIds": [
-      "source.who.emergency"
+    "sourceReferences": [
+      {
+        "sourceId": "source.who.emergency"
+      }
     ]
   },
   "substances": [
@@ -125,13 +127,17 @@
           "title": "Identity and potency may be uncertain",
           "body": "Products sold as 2C-B can be misrepresented, and relatively small quantity differences may change intensity.",
           "action": "Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.",
-          "sourceIds": [
-            "source.nida.hallucinogens"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
           ]
         }
       ],
-      "sourceIds": [
-        "source.nida.hallucinogens"
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
       ]
     },
     {
@@ -170,8 +176,10 @@
           "title": "Reduced awareness and breathing need attention",
           "body": "Heavy sedation, vomiting, and loss of coordination can become dangerous, especially with alcohol, opioids, or other depressants.",
           "action": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
-          "sourceIds": [
-            "source.nhs.ketamine"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nhs.ketamine"
+            }
           ]
         }
       ],
@@ -188,8 +196,10 @@
             }
           ],
           "context": "A descriptive range is not a safe or recommended dose. Product identity, tolerance, technique, and individual response vary.",
-          "sourceIds": [
-            "source.nhs.ketamine"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nhs.ketamine"
+            }
           ]
         }
       ],
@@ -212,27 +222,43 @@
             }
           ],
           "uncertainty": "Route, amount, tolerance, product contents, and combinations change timing.",
-          "sourceIds": [
-            "source.nhs.ketamine"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nhs.ketamine"
+            }
           ]
         }
       ],
       "effects": {
-        "common": [
-          "Detachment, altered movement, time, sound, and body perception"
-        ],
-        "unwanted": [
-          "Nausea, confusion, memory gaps, falls, and unconsciousness"
-        ],
-        "variability": [
-          "Setting, tolerance, route, and combinations can substantially change effects"
-        ]
+        "common": {
+          "id": "effect.ketamine.common",
+          "items": [
+            "Detachment, altered movement, time, sound, and body perception"
+          ]
+        },
+        "unwanted": {
+          "id": "effect.ketamine.unwanted",
+          "items": [
+            "Nausea, confusion, memory gaps, falls, and unconsciousness"
+          ]
+        },
+        "variability": {
+          "id": "effect.ketamine.variability",
+          "items": [
+            "Setting, tolerance, route, and combinations can substantially change effects"
+          ]
+        }
       },
       "helpSigns": [
-        "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+        {
+          "id": "sign.ketamine.unresponsive-breathing",
+          "body": "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+        }
       ],
-      "sourceIds": [
-        "source.nhs.ketamine"
+      "sourceReferences": [
+        {
+          "sourceId": "source.nhs.ketamine"
+        }
       ]
     },
     {
@@ -279,8 +305,10 @@
           "title": "Dangerous overheating can happen",
           "body": "Hot environments, sustained exertion, and other substances can increase strain. A person who is very hot, confused, collapses, or has a seizure needs emergency help.",
           "action": "Stop exertion, move to a cooler place, stay together, and call emergency services for severe signs.",
-          "sourceIds": [
-            "source.nida.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.mdma"
+            }
           ]
         },
         {
@@ -289,8 +317,10 @@
           "title": "Interactions can be serious",
           "body": "Some medicines and substances can add serotonergic, cardiovascular, or overheating risk. The contents of products sold as MDMA are also uncertain.",
           "action": "Avoid mixing; seek qualified medication advice rather than stopping prescribed medication yourself.",
-          "sourceIds": [
-            "source.nida.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.mdma"
+            }
           ]
         }
       ],
@@ -313,8 +343,10 @@
           ],
           "context": "Descriptive published/observed ranges are not a safe or recommended dose. Potency, contents, body, medicines, setting, and individual response vary.",
           "redosing": "Effects can still be developing when someone considers taking more. Repeated dosing increases cumulative exposure and can prolong unwanted effects.",
-          "sourceIds": [
-            "source.emcdda.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.emcdda.mdma"
+            }
           ]
         }
       ],
@@ -343,69 +375,101 @@
             }
           ],
           "uncertainty": "Food, contents, dose, metabolism, medicines, redosing, and other substances can shift these ranges.",
-          "sourceIds": [
-            "source.emcdda.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.emcdda.mdma"
+            }
           ]
         }
       ],
       "effects": {
-        "common": [
-          "Increased energy, sociability, sensory intensity, and emotional openness",
-          "Faster heart rate, jaw tension, sweating, and reduced appetite"
-        ],
-        "unwanted": [
-          "Anxiety, nausea, overheating, confusion, insomnia, and low mood afterward"
-        ],
-        "variability": [
-          "Contents and potency are not knowable from appearance",
-          "Environment, exertion, hydration, health, medicines, and combinations matter"
-        ]
+        "common": {
+          "id": "effect.mdma.common",
+          "items": [
+            "Increased energy, sociability, sensory intensity, and emotional openness",
+            "Faster heart rate, jaw tension, sweating, and reduced appetite"
+          ]
+        },
+        "unwanted": {
+          "id": "effect.mdma.unwanted",
+          "items": [
+            "Anxiety, nausea, overheating, confusion, insomnia, and low mood afterward"
+          ]
+        },
+        "variability": {
+          "id": "effect.mdma.variability",
+          "items": [
+            "Contents and potency are not knowable from appearance",
+            "Environment, exertion, hydration, health, medicines, and combinations matter"
+          ]
+        }
       },
       "testing": {
+        "id": "testing.mdma.preview",
         "summary": "A reagent reaction can be consistent with the presence of MDMA; it does not confirm identity, purity, dose, or rule out additional substances.",
         "reactions": [
           "Marquis: a rapid dark purple-to-black reaction is reported as consistent with an MDxx-type substance, not confirmation of MDMA."
         ],
         "limitations": "Use more than one appropriate reagent and compare against current instructions. Laboratory analysis offers stronger identification where available.",
-        "sourceIds": [
-          "source.emcdda.mdma"
+        "sourceReferences": [
+          {
+            "sourceId": "source.emcdda.mdma"
+          }
         ]
       },
       "helpSigns": [
-        "Very high body temperature or hot skin with confusion",
-        "Collapse, seizure, severe agitation, chest pain, or difficulty breathing"
+        {
+          "id": "sign.mdma.overheating-confusion",
+          "body": "Very high body temperature or hot skin with confusion"
+        },
+        {
+          "id": "sign.mdma.collapse-severe",
+          "body": "Collapse, seizure, severe agitation, chest pain, or difficulty breathing"
+        }
       ],
       "relationships": [
         {
+          "id": "relationship.mdma.ketamine",
           "substanceId": "substance.ketamine",
           "reason": "Sometimes encountered in the same settings; combined stimulant and dissociative effects can make impairment and warning signs harder to interpret."
         },
         {
+          "id": "relationship.mdma.2cb",
           "substanceId": "substance.2cb",
           "reason": "Both may be sold in tablet or powder form and can be misrepresented; their effects and risk contexts are not interchangeable."
         }
       ],
       "rabbitHole": [
         {
+          "id": "pharmacology.mdma.monoamine-signaling",
           "level": "plain",
           "body": "MDMA increases signaling involving serotonin, norepinephrine, and dopamine. Serotonin-related effects are prominent, but no single transmitter explains the whole experience.",
           "certainty": "established",
-          "sourceIds": [
-            "source.nida.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.mdma"
+            }
           ]
         },
         {
+          "id": "pharmacology.mdma.transporter-flow",
           "level": "deep",
           "body": "MDMA reverses monoamine transporter flow and affects neuroendocrine systems. Human experience depends on dose, context, expectations, and uncertain product contents, so mechanism is not a prediction of an individual's response.",
           "certainty": "inference",
-          "sourceIds": [
-            "source.emcdda.mdma"
+          "sourceReferences": [
+            {
+              "sourceId": "source.emcdda.mdma"
+            }
           ]
         }
       ],
-      "sourceIds": [
-        "source.emcdda.mdma",
-        "source.nida.mdma"
+      "sourceReferences": [
+        {
+          "sourceId": "source.emcdda.mdma"
+        },
+        {
+          "sourceId": "source.nida.mdma"
+        }
       ]
     },
     {
@@ -446,8 +510,10 @@
           "title": "Mushroom identification errors can be dangerous",
           "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
           "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
-          "sourceIds": [
-            "source.nida.hallucinogens"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
           ]
         },
         {
@@ -456,8 +522,10 @@
           "title": "Distress and unsafe behavior can occur",
           "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
           "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
-          "sourceIds": [
-            "source.nida.hallucinogens"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
           ]
         }
       ],
@@ -480,27 +548,43 @@
             }
           ],
           "uncertainty": "Species, specimen, preparation, food, amount, person, and setting can shift timing and intensity.",
-          "sourceIds": [
-            "source.nida.hallucinogens"
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
           ]
         }
       ],
       "effects": {
-        "common": [
-          "Changes in perception, time, emotion, and thought"
-        ],
-        "unwanted": [
-          "Anxiety, panic, confusion, nausea, and impaired judgment"
-        ],
-        "variability": [
-          "Natural material can vary substantially even within one batch"
-        ]
+        "common": {
+          "id": "effect.psilocybin-mushrooms.common",
+          "items": [
+            "Changes in perception, time, emotion, and thought"
+          ]
+        },
+        "unwanted": {
+          "id": "effect.psilocybin-mushrooms.unwanted",
+          "items": [
+            "Anxiety, panic, confusion, nausea, and impaired judgment"
+          ]
+        },
+        "variability": {
+          "id": "effect.psilocybin-mushrooms.variability",
+          "items": [
+            "Natural material can vary substantially even within one batch"
+          ]
+        }
       },
       "helpSigns": [
-        "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+        {
+          "id": "sign.psilocybin-mushrooms.severe-signs",
+          "body": "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+        }
       ],
-      "sourceIds": [
-        "source.nida.hallucinogens"
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
       ]
     }
   ],

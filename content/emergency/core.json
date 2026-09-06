@@ -19,5 +19,5 @@
     "Tell responders what may have been taken, when, and whether more than one substance may be involved. You will still get guidance if you do not know."
   ],
   "unknown": "You do not need to know the substance or dose. Treat observable signs and call for help when in doubt.",
-  "sourceIds": ["source.who.emergency"]
+  "sourceReferences": [{ "sourceId": "source.who.emergency" }]
 }
