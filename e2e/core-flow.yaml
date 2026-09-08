@@ -5,9 +5,16 @@ appId: app.dosed.reference
 - tapOn: Search substances
 - inputText: molly
 - tapOn: Open MDMA profile
-- assertVisible: First, the important bits
+- assertVisible: Safety Snapshot
+- scrollUntilVisible:
+    element: Content review
+    direction: DOWN
+    timeout: 15000
 - tapOn: Something feels wrong? Open emergency guidance
-- assertVisible: Get emergency help
+- assertVisible: '.*Get emergency help now.*'
+- tapOn: Back to browsing
 - back
 - back
 - assertVisible: Recently viewed
+- tapOn: Clear recently viewed
+- assertNotVisible: Recently viewed

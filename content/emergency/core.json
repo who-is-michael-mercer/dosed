@@ -1,9 +1,12 @@
 {
   "id": "emergency.core",
   "review": {
-    "status": "needs_clinical_review",
-    "reviewedAt": "2026-09-01",
-    "reviewDue": "2026-12-01"
+    "status": "draft",
+    "legacyRecord": {
+      "status": "needs_clinical_review",
+      "recordedAt": "2026-09-01",
+      "reviewDue": "2026-12-01"
+    }
   },
   "expected": [
     "Stay with the person and keep checking how they respond.",
@@ -19,5 +22,9 @@
     "Tell responders what may have been taken, when, and whether more than one substance may be involved. You will still get guidance if you do not know."
   ],
   "unknown": "You do not need to know the substance or dose. Treat observable signs and call for help when in doubt.",
-  "sourceReferences": [{ "sourceId": "source.who.emergency" }]
+  "sourceReferences": [
+    {
+      "sourceId": "source.who.emergency"
+    }
+  ]
 }

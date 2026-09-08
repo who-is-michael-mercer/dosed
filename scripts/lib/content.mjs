@@ -1,10 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { authoredContentSchema } from '../../src/domain/content.ts';
+import { releaseConfigSchema, releaseErrors } from '../../src/domain/release.ts';
+import { rankSubstances } from '../../src/application/search/searchSubstances.ts';
 
 export const ROOT = path.resolve(import.meta.dirname, '../..');
-export const CONTENT_SCHEMA_VERSION = 2;
-export const CONTENT_VERSION = '2026.09.06';
+export const CONTENT_SCHEMA_VERSION = 4;
+export const CONTENT_VERSION = '2026.09.07';
 export const compareCodePoints = (a, b) => {
   const left = [...a];
   const right = [...b];
@@ -53,10 +55,28 @@ export function loadContent() {
     .filter((file) => file.endsWith('.json'))
     .sort(compareCodePoints)
     .map((file) => readJson(`content/substances/${file}`));
-  return { categories, sources, emergency, substances };
+  const optionalTaxonomy = (name) =>
+    fs.existsSync(path.join(ROOT, `content/taxonomy/${name}.json`))
+      ? readJson(`content/taxonomy/${name}.json`)
+      : [];
+  return {
+    categories,
+    subgroups: optionalTaxonomy('subgroups'),
+    tags: optionalTaxonomy('tags'),
+    sources,
+    emergency,
+    substances,
+  };
 }
 
 const formatPath = (pathParts) => pathParts.map(String).join('.') || 'content';
+const formatIssues = (issues, prefix = []) =>
+  issues.flatMap((issue) => {
+    const path = [...prefix, ...issue.path];
+    return issue.code === 'invalid_union'
+      ? issue.errors.flatMap((branch) => formatIssues(branch, path))
+      : [`${formatPath(path)}: ${issue.message}`];
+  });
 const sortUnique = (values) => [...new Set(values)].sort(compareCodePoints);
 
 const walk = (value, pathParts, visit) => {
@@ -98,21 +118,34 @@ export function validateContent(content = loadContent()) {
   }
   if (!parsed.success) {
     return {
-      errors: sortUnique(
-        parsed.error.issues.map((issue) => `${formatPath(issue.path)}: ${issue.message}`),
-      ),
+      errors: sortUnique(formatIssues(parsed.error.issues)),
       ambiguousAliases: [],
     };
   }
 
   const validated = parsed.data;
-  const errors = [];
+  const config = releaseConfigSchema.parse(readJson('config/release.json'));
+  const errors = releaseErrors(validated, config, new Date().toISOString().slice(0, 10));
   const categoryIds = new Set(validated.categories.map(({ id }) => id));
+  const subgroupIds = new Set((validated.subgroups ?? []).map(({ id }) => id));
+  const tagIds = new Set((validated.tags ?? []).map(({ id }) => id));
   const sourceIds = new Set(validated.sources.map(({ id }) => id));
   const substanceIds = new Set(validated.substances.map(({ id }) => id));
   const ids = new Map();
 
   walk(validated, [], (value, pathParts) => {
+    for (const [field, known] of [
+      ['subgroupIds', subgroupIds],
+      ['tagIds', tagIds],
+    ]) {
+      if (Array.isArray(value[field]))
+        value[field].forEach((id, index) => {
+          if (!known.has(id))
+            errors.push(
+              `${formatPath([...pathParts, field, index])}: broken taxonomy reference ${id}`,
+            );
+        });
+    }
     if (typeof value.id === 'string') {
       const previousPath = ids.get(value.id);
       if (previousPath !== undefined) {
@@ -146,7 +179,32 @@ export function validateContent(content = loadContent()) {
   });
 
   validated.substances.forEach((substance, substanceIndex) => {
+    for (const id of substance.subgroupIds ?? []) {
+      const subgroup = validated.subgroups?.find((item) => item.id === id);
+      if (
+        subgroup &&
+        !subgroup.categoryIds.some((categoryId) => substance.categoryIds.includes(categoryId))
+      )
+        errors.push(
+          `substances.${substanceIndex}.subgroupIds: subgroup ${id} has no applicable category`,
+        );
+    }
     const substancePath = ['substances', substanceIndex];
+    const actionIds = new Set(substance.harmReductionActions.map(({ id }) => id));
+    const orders = new Set();
+    substance.safetyClaims.forEach((claim, index) => {
+      if (orders.has(claim.order))
+        errors.push(
+          `${formatPath([...substancePath, 'safetyClaims', index, 'order'])}: duplicate authored safety order`,
+        );
+      orders.add(claim.order);
+      claim.actionIds.forEach((id) => {
+        if (!actionIds.has(id))
+          errors.push(
+            `${formatPath([...substancePath, 'safetyClaims', index, 'actionIds'])}: broken action ${id}`,
+          );
+      });
+    });
     const seenCategoryIds = new Set();
     substance.categoryIds.forEach((categoryId, categoryIndex) => {
       if (seenCategoryIds.has(categoryId)) {
@@ -238,25 +296,20 @@ export function buildContentBundle(content) {
 
 export const serializeContentBundle = (bundle) => `${JSON.stringify(bundle, null, 2)}\n`;
 
+// Keep urgent offline guidance independent of profile/search bundle growth.
+export function buildEmergencyBundle(bundle) {
+  return {
+    schemaVersion: bundle.schemaVersion,
+    contentVersion: bundle.contentVersion,
+    emergency: bundle.emergency,
+    contexts: bundle.substances.map(({ id, name }) => ({ id, name })),
+  };
+}
+
 export function search(index, substances, query) {
-  const q = normalize(query),
-    qc = compact(query);
-  if (!q) return [];
-  const scores = new Map();
-  for (const item of index) {
-    let score = 0;
-    if (item.term === q || item.compact === qc) score = item.weight + 100;
-    else if (item.term.startsWith(q) || item.compact.startsWith(qc))
-      score = item.weight + 60 - q.length;
-    else {
-      const d = distance(qc, item.compact);
-      const bound = qc.length >= 5 ? 2 : 1;
-      if (d <= bound) score = item.weight + 30 - d * 10;
-    }
-    if (score > 0) scores.set(item.substanceId, Math.max(scores.get(item.substanceId) ?? 0, score));
-  }
-  return [...scores]
-    .map(([id, score]) => ({ substance: substances.find((s) => s.id === id), score }))
-    .filter((x) => x.substance)
-    .sort((a, b) => b.score - a.score || compareCodePoints(a.substance.name, b.substance.name));
+  const ids = new Set(index.map((item) => item.substanceId));
+  return rankSubstances(
+    substances.filter((substance) => ids.has(substance.id)),
+    query,
+  );
 }

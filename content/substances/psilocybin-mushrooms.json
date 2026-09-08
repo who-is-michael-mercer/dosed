@@ -2,17 +2,31 @@
   "id": "substance.psilocybin-mushrooms",
   "name": "Psilocybin mushrooms",
   "aliases": [
-    { "text": "Magic mushrooms", "kind": "common", "display": true },
-    { "text": "Shrooms", "kind": "slang", "display": true }
+    {
+      "text": "Magic mushrooms",
+      "kind": "common",
+      "display": true
+    },
+    {
+      "text": "Shrooms",
+      "kind": "slang",
+      "display": true
+    }
   ],
   "searchTerms": ["psilocybin"],
   "categoryIds": ["category.psychedelic"],
-  "visual": { "symbol": "Ψ", "color": "violet" },
+  "visual": {
+    "symbol": "Ψ",
+    "color": "violet"
+  },
   "identity": "Fungi containing psilocybin whose potency and effects vary by species, specimen, preparation, person, and setting.",
   "review": {
-    "status": "needs_clinical_review",
-    "reviewedAt": "2026-09-01",
-    "reviewDue": "2026-12-01"
+    "status": "draft",
+    "legacyRecord": {
+      "status": "needs_clinical_review",
+      "recordedAt": "2026-09-01",
+      "reviewDue": "2026-12-01"
+    }
   },
   "safetyClaims": [
     {
@@ -20,16 +34,26 @@
       "priority": "critical",
       "title": "Mushroom identification errors can be dangerous",
       "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
-      "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
-      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
+      ],
+      "order": 0,
+      "actionIds": ["action.mushrooms.identity"]
     },
     {
       "id": "claim.mushrooms.context",
       "priority": "important",
       "title": "Distress and unsafe behavior can occur",
       "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
-      "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
-      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
+      ],
+      "order": 1,
+      "actionIds": ["action.mushrooms.context"]
     }
   ],
   "timelines": [
@@ -37,11 +61,27 @@
       "id": "timeline.mushrooms.oral",
       "route": "oral",
       "phases": [
-        { "label": "Onset", "min": 20, "max": 60, "unit": "minutes" },
-        { "label": "Main effects", "min": 4, "max": 6, "unit": "hours" }
+        {
+          "label": "Onset",
+          "kind": "onset",
+          "min": 20,
+          "max": 60,
+          "unit": "minutes"
+        },
+        {
+          "label": "Main effects",
+          "kind": "main_effects",
+          "min": 4,
+          "max": 6,
+          "unit": "hours"
+        }
       ],
       "uncertainty": "Species, specimen, preparation, food, amount, person, and setting can shift timing and intensity.",
-      "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
+      ]
     }
   ],
   "effects": {
@@ -61,8 +101,33 @@
   "helpSigns": [
     {
       "id": "sign.psilocybin-mushrooms.severe-signs",
+      "action": "open_emergency",
       "body": "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
     }
   ],
-  "sourceReferences": [{ "sourceId": "source.nida.hallucinogens" }]
+  "sourceReferences": [
+    {
+      "sourceId": "source.nida.hallucinogens"
+    }
+  ],
+  "harmReductionActions": [
+    {
+      "id": "action.mushrooms.identity",
+      "body": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
+      ]
+    },
+    {
+      "id": "action.mushrooms.context",
+      "body": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
+      "sourceReferences": [
+        {
+          "sourceId": "source.nida.hallucinogens"
+        }
+      ]
+    }
+  ]
 }

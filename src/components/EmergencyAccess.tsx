@@ -16,4 +16,4 @@ export function EmergencyAccess({ substanceId }: { substanceId?: SubstanceId }) 
     </Action>
   );
 }
-const styles = StyleSheet.create({ button: { backgroundColor: colors.emergency } });
+const styles = StyleSheet.create({ button: { backgroundColor: colors.emergencySurface } });

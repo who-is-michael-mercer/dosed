@@ -1,50 +1,77 @@
-import { useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { searchSubstances } from '../../../src/application/search/searchSubstances';
 import { SubstanceCard } from '../../../src/components/SubstanceCard';
-import { EmergencyAccess } from '../../../src/components/EmergencyAccess';
-import { AppText, Heading } from '../../../src/components/ui';
+import { ScreenFrame } from '../../../src/components/ScreenFrame';
+import { Action, AppText, Heading } from '../../../src/components/ui';
 import { colors, spacing } from '../../../src/design/tokens';
 import { contentRepository } from '../../../src/infrastructure/content/LocalContentRepository';
 export default function Search() {
   const [query, setQuery] = useState('');
-  const results = searchSubstances(contentRepository.listSubstances(), query);
+  const deferredQuery = useDeferredValue(query);
+  const results = useMemo(
+    () => searchSubstances(contentRepository.listSubstances(), deferredQuery),
+    [deferredQuery],
+  );
   return (
-    <View style={styles.page}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Heading>Search the field guide</Heading>
-        <TextInput
-          autoFocus
-          accessibilityLabel="Search substances"
-          placeholder="MDMA, molly, 2cb…"
-          placeholderTextColor={colors.muted}
-          value={query}
-          onChangeText={setQuery}
-          style={styles.input}
-        />
-        {query.length > 0 && results.length === 0 && (
-          <AppText>No substance matches that. Try a name or alias.</AppText>
-        )}
-        {results.map((s) => (
+    <ScreenFrame>
+      <FlatList
+        data={results}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => (
           <SubstanceCard
-            key={s.id}
-            substance={s}
+            substance={item}
             onPress={() =>
-              router.push({ pathname: '/substance/[substanceId]', params: { substanceId: s.id } })
+              router.push({
+                pathname: '/substance/[substanceId]',
+                params: { substanceId: item.id },
+              })
             }
           />
-        ))}
-      </ScrollView>
-      <View style={styles.emergency}>
-        <EmergencyAccess />
-      </View>
-    </View>
+        )}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Heading>Search the field guide</Heading>
+            <TextInput
+              autoFocus
+              autoCorrect={false}
+              autoCapitalize="none"
+              maxLength={100}
+              accessibilityLabel="Search substances"
+              placeholder="MDMA, molly, 2cb…"
+              placeholderTextColor={colors.muted}
+              value={query}
+              onChangeText={setQuery}
+              style={styles.input}
+            />
+            {query.length > 0 && <Action onPress={() => setQuery('')}>Clear search</Action>}
+            {!query.trim() && <AppText>Search by substance name or alias.</AppText>}
+            {results.length > 1 && (
+              <AppText>
+                A name or alias can match multiple profiles. Check each profile's identity details.
+              </AppText>
+            )}
+            {results.length > 0 && (
+              <AppText accessibilityLiveRegion="polite">
+                {results.length} matching {results.length === 1 ? 'profile' : 'profiles'}
+              </AppText>
+            )}
+            {query.length > 0 && results.length === 0 && (
+              <AppText>No substance matches that. Try a name or alias.</AppText>
+            )}
+          </View>
+        }
+      />
+    </ScreenFrame>
   );
 }
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, paddingBottom: 100, gap: spacing.md },
+  content: { padding: spacing.lg, gap: spacing.md },
+  header: { gap: spacing.md, marginBottom: spacing.md },
   input: {
     minHeight: 52,
     borderRadius: 12,

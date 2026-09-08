@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import type { Substance } from '../domain/content';
 import { colors, radius, spacing } from '../design/tokens';
 import { AppText, Heading } from './ui';
+import { selectSafety } from '../application/profile/selectSafety';
 export function SubstanceCard({
   substance,
   compact = false,
@@ -11,16 +12,27 @@ export function SubstanceCard({
   compact?: boolean;
   onPress: () => void;
 }) {
-  const flags = substance.safetyClaims.slice(0, 2);
+  const flags = selectSafety(substance).snapshot.slice(0, 2);
   return (
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={`Open ${substance.name} profile`}
+      accessibilityHint={
+        compact
+          ? substance.identity
+          : `${substance.identity} ${flags.map((flag) => `${flag.priority}: ${flag.title}`).join('. ')}`
+      }
       onPress={onPress}
       style={styles.card}
     >
-      <View style={[styles.art, { borderColor: colors[substance.visual.color] }]}>
-        <AppText style={styles.symbol}>{substance.visual.symbol}</AppText>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[styles.art, { borderColor: colors[substance.visual?.color ?? 'coral'] }]}
+      >
+        <AppText style={styles.symbol}>
+          {substance.visual?.symbol ?? substance.name.slice(0, 1)}
+        </AppText>
       </View>
       <View style={styles.copy}>
         <Heading>{substance.name}</Heading>

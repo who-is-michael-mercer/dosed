@@ -1,0 +1,37 @@
+[
+  {
+    "id": "source.emcdda.mdma",
+    "title": "MDMA drug profile",
+    "organization": "EUDA",
+    "year": 2023,
+    "url": "https://www.euda.europa.eu/publications/drug-profiles/mdma_en"
+  },
+  {
+    "id": "source.nida.mdma",
+    "title": "MDMA (Ecstasy/Molly) DrugFacts",
+    "organization": "NIDA",
+    "year": 2024,
+    "url": "https://nida.nih.gov/publications/drugfacts/mdma-ecstasymolly"
+  },
+  {
+    "id": "source.nhs.ketamine",
+    "title": "Ketamine",
+    "organization": "NHS inform",
+    "year": 2024,
+    "url": "https://www.nhsinform.scot/healthy-living/drugs-and-drug-use/common-drugs/ketamine/"
+  },
+  {
+    "id": "source.nida.hallucinogens",
+    "title": "Hallucinogens DrugFacts",
+    "organization": "NIDA",
+    "year": 2024,
+    "url": "https://nida.nih.gov/publications/drugfacts/hallucinogens"
+  },
+  {
+    "id": "source.who.emergency",
+    "title": "Basic emergency care",
+    "organization": "World Health Organization",
+    "year": 2018,
+    "url": "https://www.who.int/publications/i/item/9789241513081"
+  }
+]

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "contentVersion": "2026.09.06",
+  "schemaVersion": 4,
+  "contentVersion": "2026.09.07",
   "categories": [
     {
       "id": "category.stimulant",
@@ -24,6 +24,8 @@
       "color": "violet"
     }
   ],
+  "subgroups": [],
+  "tags": [],
   "sources": [
     {
       "id": "source.emcdda.mdma",
@@ -64,9 +66,12 @@
   "emergency": {
     "id": "emergency.core",
     "review": {
-      "status": "needs_clinical_review",
-      "reviewedAt": "2026-09-01",
-      "reviewDue": "2026-12-01"
+      "status": "draft",
+      "legacyRecord": {
+        "status": "needs_clinical_review",
+        "recordedAt": "2026-09-01",
+        "reviewDue": "2026-12-01"
+      }
     },
     "expected": [
       "Stay with the person and keep checking how they respond.",
@@ -116,17 +121,34 @@
       },
       "identity": "A synthetic psychedelic phenethylamine with stimulant-like and perception-altering effects.",
       "review": {
-        "status": "needs_clinical_review",
-        "reviewedAt": "2026-09-01",
-        "reviewDue": "2026-12-01"
+        "status": "draft",
+        "legacyRecord": {
+          "status": "needs_clinical_review",
+          "recordedAt": "2026-09-01",
+          "reviewDue": "2026-12-01"
+        }
       },
       "safetyClaims": [
         {
           "id": "claim.2cb.uncertainty",
+          "order": 0,
           "priority": "important",
           "title": "Identity and potency may be uncertain",
           "body": "Products sold as 2C-B can be misrepresented, and relatively small quantity differences may change intensity.",
-          "action": "Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.",
+          "actionIds": [
+            "action.2cb.uncertainty"
+          ],
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
+          ]
+        }
+      ],
+      "harmReductionActions": [
+        {
+          "id": "action.2cb.uncertainty",
+          "body": "Treat appearance and seller claims as uncertain; avoid combinations and seek help for severe signs.",
           "sourceReferences": [
             {
               "sourceId": "source.nida.hallucinogens"
@@ -165,17 +187,34 @@
       },
       "identity": "A dissociative anaesthetic that can alter perception, coordination, memory, and connection to the body and surroundings.",
       "review": {
-        "status": "needs_clinical_review",
-        "reviewedAt": "2026-09-01",
-        "reviewDue": "2026-12-01"
+        "status": "draft",
+        "legacyRecord": {
+          "status": "needs_clinical_review",
+          "recordedAt": "2026-09-01",
+          "reviewDue": "2026-12-01"
+        }
       },
       "safetyClaims": [
         {
           "id": "claim.ketamine.sedation",
+          "order": 0,
           "priority": "critical",
           "title": "Reduced awareness and breathing need attention",
           "body": "Heavy sedation, vomiting, and loss of coordination can become dangerous, especially with alcohol, opioids, or other depressants.",
-          "action": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
+          "actionIds": [
+            "action.ketamine.sedation"
+          ],
+          "sourceReferences": [
+            {
+              "sourceId": "source.nhs.ketamine"
+            }
+          ]
+        }
+      ],
+      "harmReductionActions": [
+        {
+          "id": "action.ketamine.sedation",
+          "body": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
           "sourceReferences": [
             {
               "sourceId": "source.nhs.ketamine"
@@ -210,12 +249,14 @@
           "phases": [
             {
               "label": "Onset",
+              "kind": "onset",
               "min": 5,
               "max": 15,
               "unit": "minutes"
             },
             {
               "label": "Main effects",
+              "kind": "main_effects",
               "min": 30,
               "max": 60,
               "unit": "minutes"
@@ -252,7 +293,8 @@
       "helpSigns": [
         {
           "id": "sign.ketamine.unresponsive-breathing",
-          "body": "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
+          "body": "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy",
+          "action": "open_emergency"
         }
       ],
       "sourceReferences": [
@@ -294,17 +336,23 @@
       },
       "identity": "A synthetic psychoactive substance with stimulant and perception-altering effects, often associated with increased sociability and emotional openness.",
       "review": {
-        "status": "needs_clinical_review",
-        "reviewedAt": "2026-09-01",
-        "reviewDue": "2026-12-01"
+        "status": "draft",
+        "legacyRecord": {
+          "status": "needs_clinical_review",
+          "recordedAt": "2026-09-01",
+          "reviewDue": "2026-12-01"
+        }
       },
       "safetyClaims": [
         {
           "id": "claim.mdma.temperature",
+          "order": 0,
           "priority": "critical",
           "title": "Dangerous overheating can happen",
           "body": "Hot environments, sustained exertion, and other substances can increase strain. A person who is very hot, confused, collapses, or has a seizure needs emergency help.",
-          "action": "Stop exertion, move to a cooler place, stay together, and call emergency services for severe signs.",
+          "actionIds": [
+            "action.mdma.temperature"
+          ],
           "sourceReferences": [
             {
               "sourceId": "source.nida.mdma"
@@ -313,10 +361,33 @@
         },
         {
           "id": "claim.mdma.interactions",
+          "order": 1,
           "priority": "important",
           "title": "Interactions can be serious",
           "body": "Some medicines and substances can add serotonergic, cardiovascular, or overheating risk. The contents of products sold as MDMA are also uncertain.",
-          "action": "Avoid mixing; seek qualified medication advice rather than stopping prescribed medication yourself.",
+          "actionIds": [
+            "action.mdma.interactions"
+          ],
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.mdma"
+            }
+          ]
+        }
+      ],
+      "harmReductionActions": [
+        {
+          "id": "action.mdma.temperature",
+          "body": "Stop exertion, move to a cooler place, stay together, and call emergency services for severe signs.",
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.mdma"
+            }
+          ]
+        },
+        {
+          "id": "action.mdma.interactions",
+          "body": "Avoid mixing; seek qualified medication advice rather than stopping prescribed medication yourself.",
           "sourceReferences": [
             {
               "sourceId": "source.nida.mdma"
@@ -357,18 +428,21 @@
           "phases": [
             {
               "label": "Onset",
+              "kind": "onset",
               "min": 20,
               "max": 60,
               "unit": "minutes"
             },
             {
               "label": "Main effects",
+              "kind": "main_effects",
               "min": 3,
               "max": 6,
               "unit": "hours"
             },
             {
               "label": "After-effects",
+              "kind": "after_effects",
               "min": 1,
               "max": 2,
               "unit": "days"
@@ -420,22 +494,26 @@
       "helpSigns": [
         {
           "id": "sign.mdma.overheating-confusion",
-          "body": "Very high body temperature or hot skin with confusion"
+          "body": "Very high body temperature or hot skin with confusion",
+          "action": "open_emergency"
         },
         {
           "id": "sign.mdma.collapse-severe",
-          "body": "Collapse, seizure, severe agitation, chest pain, or difficulty breathing"
+          "body": "Collapse, seizure, severe agitation, chest pain, or difficulty breathing",
+          "action": "open_emergency"
         }
       ],
       "relationships": [
         {
           "id": "relationship.mdma.ketamine",
           "substanceId": "substance.ketamine",
+          "type": "context",
           "reason": "Sometimes encountered in the same settings; combined stimulant and dissociative effects can make impairment and warning signs harder to interpret."
         },
         {
           "id": "relationship.mdma.2cb",
           "substanceId": "substance.2cb",
+          "type": "context",
           "reason": "Both may be sold in tablet or powder form and can be misrepresented; their effects and risk contexts are not interchangeable."
         }
       ],
@@ -499,17 +577,23 @@
       },
       "identity": "Fungi containing psilocybin whose potency and effects vary by species, specimen, preparation, person, and setting.",
       "review": {
-        "status": "needs_clinical_review",
-        "reviewedAt": "2026-09-01",
-        "reviewDue": "2026-12-01"
+        "status": "draft",
+        "legacyRecord": {
+          "status": "needs_clinical_review",
+          "recordedAt": "2026-09-01",
+          "reviewDue": "2026-12-01"
+        }
       },
       "safetyClaims": [
         {
           "id": "claim.mushrooms.identity",
+          "order": 0,
           "priority": "critical",
           "title": "Mushroom identification errors can be dangerous",
           "body": "Appearance alone is not a reliable way to identify a mushroom; poisonous species can be mistaken for psychoactive ones.",
-          "action": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
+          "actionIds": [
+            "action.mushrooms.identity"
+          ],
           "sourceReferences": [
             {
               "sourceId": "source.nida.hallucinogens"
@@ -518,10 +602,33 @@
         },
         {
           "id": "claim.mushrooms.context",
+          "order": 1,
           "priority": "important",
           "title": "Distress and unsafe behavior can occur",
           "body": "Perceptual and psychological effects can become overwhelming or disorienting.",
-          "action": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
+          "actionIds": [
+            "action.mushrooms.context"
+          ],
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
+          ]
+        }
+      ],
+      "harmReductionActions": [
+        {
+          "id": "action.mushrooms.identity",
+          "body": "Do not consume unidentified wild mushrooms. Contact emergency or poison services after a suspected poisonous mushroom exposure.",
+          "sourceReferences": [
+            {
+              "sourceId": "source.nida.hallucinogens"
+            }
+          ]
+        },
+        {
+          "id": "action.mushrooms.context",
+          "body": "Move to a calm, safer setting, reduce stimulation, and stay with a distressed person.",
           "sourceReferences": [
             {
               "sourceId": "source.nida.hallucinogens"
@@ -536,12 +643,14 @@
           "phases": [
             {
               "label": "Onset",
+              "kind": "onset",
               "min": 20,
               "max": 60,
               "unit": "minutes"
             },
             {
               "label": "Main effects",
+              "kind": "main_effects",
               "min": 4,
               "max": 6,
               "unit": "hours"
@@ -578,7 +687,8 @@
       "helpSigns": [
         {
           "id": "sign.psilocybin-mushrooms.severe-signs",
-          "body": "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion"
+          "body": "Seizure, collapse, dangerous behavior, severe confusion, or suspected poisonous mushroom ingestion",
+          "action": "open_emergency"
         }
       ],
       "sourceReferences": [

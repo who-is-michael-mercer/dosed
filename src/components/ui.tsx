@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   surface: { backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md },
   action: {
     minHeight: 48,
+    minWidth: 48,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
     borderRadius: radius.sm,

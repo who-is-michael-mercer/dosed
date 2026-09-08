@@ -9,6 +9,7 @@ export const colors = {
   important: '#E0AE55',
   critical: '#EA765F',
   emergency: '#D94A43',
+  emergencySurface: '#B83934',
   coral: '#CF7867',
   blue: '#668FA8',
   violet: '#8C79A9',

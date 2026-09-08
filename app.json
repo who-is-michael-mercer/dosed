@@ -6,9 +6,16 @@
     "scheme": "dosed",
     "orientation": "default",
     "userInterfaceStyle": "dark",
-    "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true },
-    "ios": { "supportsTablet": true, "bundleIdentifier": "app.dosed.reference" },
-    "android": { "package": "app.dosed.reference" }
+    "plugins": ["expo-router", "expo-status-bar"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.dosed.reference"
+    },
+    "android": {
+      "package": "app.dosed.reference"
+    }
   }
 }

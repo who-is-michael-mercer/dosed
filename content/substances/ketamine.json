@@ -2,17 +2,31 @@
   "id": "substance.ketamine",
   "name": "Ketamine",
   "aliases": [
-    { "text": "Ket", "kind": "slang", "display": true },
-    { "text": "K", "kind": "abbreviation", "display": true }
+    {
+      "text": "Ket",
+      "kind": "slang",
+      "display": true
+    },
+    {
+      "text": "K",
+      "kind": "abbreviation",
+      "display": true
+    }
   ],
   "searchTerms": [],
   "categoryIds": ["category.dissociative"],
-  "visual": { "symbol": "K", "color": "blue" },
+  "visual": {
+    "symbol": "K",
+    "color": "blue"
+  },
   "identity": "A dissociative anaesthetic that can alter perception, coordination, memory, and connection to the body and surroundings.",
   "review": {
-    "status": "needs_clinical_review",
-    "reviewedAt": "2026-09-01",
-    "reviewDue": "2026-12-01"
+    "status": "draft",
+    "legacyRecord": {
+      "status": "needs_clinical_review",
+      "recordedAt": "2026-09-01",
+      "reviewDue": "2026-12-01"
+    }
   },
   "safetyClaims": [
     {
@@ -20,8 +34,13 @@
       "priority": "critical",
       "title": "Reduced awareness and breathing need attention",
       "body": "Heavy sedation, vomiting, and loss of coordination can become dangerous, especially with alcohol, opioids, or other depressants.",
-      "action": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
-      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nhs.ketamine"
+        }
+      ],
+      "order": 0,
+      "actionIds": ["action.ketamine.sedation"]
     }
   ],
   "doseReferences": [
@@ -29,9 +48,19 @@
       "id": "dose.ketamine.insufflated",
       "route": "insufflated",
       "unit": "mg",
-      "ranges": [{ "label": "reported range", "min": 15, "max": 75 }],
+      "ranges": [
+        {
+          "label": "reported range",
+          "min": 15,
+          "max": 75
+        }
+      ],
       "context": "A descriptive range is not a safe or recommended dose. Product identity, tolerance, technique, and individual response vary.",
-      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nhs.ketamine"
+        }
+      ]
     }
   ],
   "timelines": [
@@ -39,11 +68,27 @@
       "id": "timeline.ketamine.insufflated",
       "route": "insufflated",
       "phases": [
-        { "label": "Onset", "min": 5, "max": 15, "unit": "minutes" },
-        { "label": "Main effects", "min": 30, "max": 60, "unit": "minutes" }
+        {
+          "label": "Onset",
+          "kind": "onset",
+          "min": 5,
+          "max": 15,
+          "unit": "minutes"
+        },
+        {
+          "label": "Main effects",
+          "kind": "main_effects",
+          "min": 30,
+          "max": 60,
+          "unit": "minutes"
+        }
       ],
       "uncertainty": "Route, amount, tolerance, product contents, and combinations change timing.",
-      "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
+      "sourceReferences": [
+        {
+          "sourceId": "source.nhs.ketamine"
+        }
+      ]
     }
   ],
   "effects": {
@@ -63,8 +108,24 @@
   "helpSigns": [
     {
       "id": "sign.ketamine.unresponsive-breathing",
+      "action": "open_emergency",
       "body": "Cannot be woken, abnormal breathing, seizure, collapse, or repeated vomiting while very drowsy"
     }
   ],
-  "sourceReferences": [{ "sourceId": "source.nhs.ketamine" }]
+  "sourceReferences": [
+    {
+      "sourceId": "source.nhs.ketamine"
+    }
+  ],
+  "harmReductionActions": [
+    {
+      "id": "action.ketamine.sedation",
+      "body": "Do not leave a heavily sedated person alone; call emergency services if they cannot be woken or breathing is abnormal.",
+      "sourceReferences": [
+        {
+          "sourceId": "source.nhs.ketamine"
+        }
+      ]
+    }
+  ]
 }

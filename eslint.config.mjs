@@ -4,7 +4,8 @@ import hooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['dist/**', 'generated/**'] },
+  { ignores: ['dist/**', 'generated/**', '.expo/**'] },
+  { files: ['*.cjs'], languageOptions: { globals: { module: 'readonly', require: 'readonly' } } },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

@@ -1,4 +1,3 @@
-import generated from '../../../generated/content.json';
 import type { Substance } from '../../domain/content';
 const normalize = (value: string) =>
   value
@@ -22,17 +21,33 @@ const distance = (a: string, b: string) => {
   }
   return row[b.length]!;
 };
-export function searchSubstances(substances: readonly Substance[], query: string): Substance[] {
+export function rankSubstances(
+  substances: readonly Substance[],
+  query: string,
+): { substance: Substance; score: number }[] {
   const q = normalize(query),
     qc = compact(query);
-  if (!q) return [];
+  if (!q || qc.length > 100) return [];
   const scores = new Map<string, number>();
-  for (const item of generated.searchIndex) {
+  const index = substances.flatMap((substance) =>
+    [
+      { text: substance.name, weight: 100 },
+      ...substance.aliases.map((alias) => ({ text: alias.text, weight: 80 })),
+      ...(substance.searchTerms ?? []).map((text) => ({ text, weight: 60 })),
+    ].map(({ text, weight }) => ({
+      substanceId: substance.id,
+      term: normalize(text),
+      compact: compact(text),
+      weight,
+    })),
+  );
+  for (const item of index) {
     let score = 0;
     if (item.term === q || item.compact === qc) score = item.weight + 100;
     else if (item.term.startsWith(q) || item.compact.startsWith(qc))
       score = item.weight + 60 - q.length;
-    else {
+    else if (qc.length >= 3 && item.compact.includes(qc)) score = item.weight + 35;
+    else if (qc.length >= 3 && Math.abs(qc.length - item.compact.length) <= 2) {
       const d = distance(qc, item.compact);
       if (d <= (qc.length >= 5 ? 2 : 1)) score = item.weight + 30 - d * 10;
     }
@@ -40,5 +55,9 @@ export function searchSubstances(substances: readonly Substance[], query: string
   }
   return [...substances]
     .filter((x) => scores.has(x.id))
-    .sort((a, b) => scores.get(b.id)! - scores.get(a.id)! || a.name.localeCompare(b.name));
+    .map((substance) => ({ substance, score: scores.get(substance.id)! }))
+    .sort((a, b) => b.score - a.score || a.substance.name.localeCompare(b.substance.name));
+}
+export function searchSubstances(substances: readonly Substance[], query: string): Substance[] {
+  return rankSubstances(substances, query).map((result) => result.substance);
 }

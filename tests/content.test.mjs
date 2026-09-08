@@ -315,9 +315,14 @@ test('a dense profile accepts evidence metadata on every supported profile recor
       sourceType: 'government_guidance',
       accessedAt: '2026-09-06',
       review: {
-        status: 'reviewed',
-        reviewedAt: '2026-09-01',
-        reviewDue: '2027-09-01',
+        status: 'evidence_assessed',
+        author: 'Fixture author',
+        authoredAt: '2026-09-01',
+        assessment: {
+          assessor: 'Fixture assessor',
+          assessedAt: '2026-09-06',
+          artifact: 'fixture-only',
+        },
       },
       status: 'current',
     },
@@ -409,8 +414,8 @@ test('generation is pure and byte-for-byte deterministic', () => {
   const first = buildContentBundle(cloneContent());
   const second = buildContentBundle(cloneContent());
   assert.deepEqual(first, second);
-  assert.equal(first.schemaVersion, 2);
-  assert.equal(first.contentVersion, '2026.09.06');
+  assert.equal(first.schemaVersion, 4);
+  assert.equal(first.contentVersion, '2026.09.07');
   assert.equal(serializeContentBundle(first), serializeContentBundle(second));
   assert.ok(serializeContentBundle(first).endsWith('\n'));
 });

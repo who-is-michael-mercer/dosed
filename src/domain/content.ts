@@ -28,9 +28,12 @@ const namespacedIdSchema = <const Namespace extends string>(namespace: Namespace
     .brand<`id:${Namespace}`>();
 
 export const categoryIdSchema = namespacedIdSchema('category');
+export const subgroupIdSchema = namespacedIdSchema('subgroup');
+export const tagIdSchema = namespacedIdSchema('tag');
 export const sourceIdSchema = namespacedIdSchema('source');
 export const substanceIdSchema = namespacedIdSchema('substance');
 export const claimIdSchema = namespacedIdSchema('claim');
+export const harmReductionActionIdSchema = namespacedIdSchema('action');
 export const doseReferenceIdSchema = namespacedIdSchema('dose');
 export const timelineIdSchema = namespacedIdSchema('timeline');
 export const effectsGroupIdSchema = namespacedIdSchema('effect');
@@ -46,13 +49,66 @@ export type SubstanceId = z.infer<typeof substanceIdSchema>;
 
 export const reviewSchema = z
   .strictObject({
-    status: z.enum(['draft', 'needs_clinical_review', 'reviewed']),
-    reviewedAt: isoDateSchema,
-    reviewDue: isoDateSchema,
+    status: z.enum(['draft', 'evidence_assessed', 'clinically_approved', 'withdrawn']),
+    author: nonBlankStringSchema.optional(),
+    authoredAt: isoDateSchema.optional(),
+    assessment: z
+      .strictObject({
+        assessor: nonBlankStringSchema,
+        assessedAt: isoDateSchema,
+        artifact: nonBlankStringSchema,
+      })
+      .optional(),
+    approval: z
+      .strictObject({
+        approver: nonBlankStringSchema,
+        qualification: nonBlankStringSchema,
+        approvedAt: isoDateSchema,
+        reviewDue: isoDateSchema,
+        artifact: nonBlankStringSchema,
+        editorialApprover: nonBlankStringSchema.optional(),
+      })
+      .optional(),
+    withdrawal: z
+      .strictObject({ reason: nonBlankStringSchema, effectiveAt: isoDateSchema })
+      .optional(),
+    legacyRecord: z
+      .strictObject({
+        status: nonBlankStringSchema,
+        recordedAt: isoDateSchema,
+        reviewDue: isoDateSchema,
+      })
+      .optional(),
   })
-  .refine((review) => review.reviewDue >= review.reviewedAt, {
-    message: 'reviewDue must not precede reviewedAt',
-    path: ['reviewDue'],
+  .superRefine((review, context) => {
+    const issue = (message: string) => context.addIssue({ code: 'custom', message });
+    if (Boolean(review.author) !== Boolean(review.authoredAt))
+      issue('author and authoredAt must be recorded together');
+    if (review.status === 'draft' && (review.assessment || review.approval || review.withdrawal))
+      issue('draft cannot carry assessment, approval, or withdrawal');
+    if (
+      ['evidence_assessed', 'clinically_approved'].includes(review.status) &&
+      (!review.author || !review.assessment)
+    )
+      issue('assessed content requires authorship and dated assessment artifact');
+    if (review.status === 'evidence_assessed' && (review.approval || review.withdrawal))
+      issue('evidence_assessed cannot carry approval or withdrawal');
+    if (review.status === 'clinically_approved' && (!review.approval || review.withdrawal))
+      issue('clinically_approved requires approval and cannot carry withdrawal');
+    if (review.status === 'withdrawn' && !review.withdrawal)
+      issue('withdrawn requires reason and effective date');
+    if (review.assessment && review.authoredAt && review.assessment.assessedAt < review.authoredAt)
+      issue('assessment must not precede authorship');
+    if (
+      review.approval &&
+      review.assessment &&
+      review.approval.approvedAt < review.assessment.assessedAt
+    )
+      issue('approval must not precede assessment');
+    if (review.approval && review.approval.reviewDue < review.approval.approvedAt)
+      issue('reviewDue must not precede approval');
+    if (review.approval?.editorialApprover === review.approval?.approver && review.approval)
+      issue('critical approval requires two different people');
   });
 export type Review = z.infer<typeof reviewSchema>;
 
@@ -122,6 +178,15 @@ export const evidenceMetadataSchema = z
     assessedAt: isoDateSchema.optional(),
   })
   .superRefine((evidence, context) => {
+    if (
+      evidence.basis?.some((basis) => ['mechanistic', 'preclinical'].includes(basis)) &&
+      (!evidence.applicability || !evidence.limitations)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'indirect evidence requires applicability and limitations',
+      });
+    }
     if (evidence.basis && new Set(evidence.basis).size !== evidence.basis.length) {
       context.addIssue({
         code: 'custom',
@@ -235,6 +300,21 @@ export const categorySchema = z.strictObject({
 });
 export type ContentColor = z.infer<typeof contentColorSchema>;
 export type Category = z.infer<typeof categorySchema>;
+export const subgroupSchema = z.strictObject({
+  id: subgroupIdSchema,
+  label: nonBlankStringSchema,
+  description: nonBlankStringSchema,
+  categoryIds: z.array(categoryIdSchema).min(1),
+  order: z.number().int().nonnegative(),
+});
+export const tagSchema = z.strictObject({
+  id: tagIdSchema,
+  label: nonBlankStringSchema,
+  description: nonBlankStringSchema,
+  order: z.number().int().nonnegative(),
+});
+export type Subgroup = z.infer<typeof subgroupSchema>;
+export type Tag = z.infer<typeof tagSchema>;
 
 export const aliasSchema = z.strictObject({
   text: nonBlankStringSchema,
@@ -244,12 +324,47 @@ export const aliasSchema = z.strictObject({
 export type Alias = z.infer<typeof aliasSchema>;
 
 export const prioritySchema = z.enum(['critical', 'important', 'context']);
-export const safetyClaimSchema = z.strictObject({
-  id: claimIdSchema,
-  priority: prioritySchema,
-  title: nonBlankStringSchema,
+export const safetyClaimSchema = z
+  .strictObject({
+    id: claimIdSchema,
+    order: z.number().int().nonnegative(),
+    priority: prioritySchema,
+    title: nonBlankStringSchema,
+    body: nonBlankStringSchema,
+    actionIds: z.array(harmReductionActionIdSchema),
+    editorialException: z
+      .strictObject({
+        reason: nonBlankStringSchema,
+        reviewedBy: nonBlankStringSchema,
+        reviewedAt: isoDateSchema,
+        artifact: nonBlankStringSchema,
+      })
+      .optional(),
+    sourceReferences: sourceReferencesSchema,
+    evidence: evidenceMetadataSchema.optional(),
+  })
+  .superRefine((claim, context) => {
+    if (!claim.actionIds.length && !claim.editorialException)
+      context.addIssue({
+        code: 'custom',
+        message: 'risk requires linked actions or an explicit reviewed editorial exception',
+        path: ['actionIds'],
+      });
+    if (new Set(claim.actionIds).size !== claim.actionIds.length)
+      context.addIssue({
+        code: 'custom',
+        message: 'action links must be unique',
+        path: ['actionIds'],
+      });
+    if (claim.actionIds.length && claim.editorialException)
+      context.addIssue({
+        code: 'custom',
+        message: 'use linked actions or an editorial exception, not both',
+      });
+  });
+export const harmReductionActionSchema = z.strictObject({
+  id: harmReductionActionIdSchema,
   body: nonBlankStringSchema,
-  action: nonBlankStringSchema,
   sourceReferences: sourceReferencesSchema,
   evidence: evidenceMetadataSchema.optional(),
 });
@@ -290,6 +405,7 @@ const requireUniqueLabels = <Item extends { label: string }>(
 export const doseRangeSchema = z
   .strictObject({
     label: nonBlankStringSchema,
+    qualifier: nonBlankStringSchema.optional(),
     min: z.number().finite().positive(),
     max: z.number().finite().positive(),
   })
@@ -297,33 +413,62 @@ export const doseRangeSchema = z
     message: 'min must be less than max',
     path: ['max'],
   });
-export const doseReferenceSchema = z.strictObject({
-  id: doseReferenceIdSchema,
-  route: routeSchema,
-  unit: doseUnitSchema,
-  ranges: z.array(doseRangeSchema).min(1).superRefine(requireUniqueLabels),
-  context: nonBlankStringSchema,
-  redosing: nonBlankStringSchema.optional(),
-  sourceReferences: sourceReferencesSchema,
-  evidence: evidenceMetadataSchema.optional(),
-});
+export const doseReferenceSchema = z.union([
+  z.strictObject({
+    id: doseReferenceIdSchema,
+    route: routeSchema,
+    unit: doseUnitSchema,
+    ranges: z.array(doseRangeSchema).min(1).superRefine(requireUniqueLabels),
+    context: nonBlankStringSchema,
+    redosing: nonBlankStringSchema.optional(),
+    uncertainty: nonBlankStringSchema.optional(),
+    potencyNotes: nonBlankStringSchema.optional(),
+    sourceReferences: sourceReferencesSchema,
+    evidence: evidenceMetadataSchema.optional(),
+  }),
+  z.strictObject({
+    id: doseReferenceIdSchema,
+    route: routeSchema,
+    availability: z.literal('unavailable'),
+    context: nonBlankStringSchema,
+    sourceReferences: sourceReferencesSchema,
+    evidence: evidenceMetadataSchema.optional(),
+  }),
+]);
 export type Route = z.infer<typeof routeSchema>;
 export type DoseUnit = z.infer<typeof doseUnitSchema>;
 export type DoseRange = z.infer<typeof doseRangeSchema>;
 export type DoseReference = z.infer<typeof doseReferenceSchema>;
 
 export const timelineUnitSchema = z.enum(['seconds', 'minutes', 'hours', 'days']);
-export const timelinePhaseSchema = z
-  .strictObject({
+export const timelinePhaseKindSchema = z.enum([
+  'onset',
+  'come_up',
+  'main_effects',
+  'after_effects',
+  'residual',
+]);
+export const timelinePhaseSchema = z.union([
+  z
+    .strictObject({
+      label: nonBlankStringSchema,
+      kind: timelinePhaseKindSchema,
+      qualifier: nonBlankStringSchema.optional(),
+      min: z.number().finite().nonnegative(),
+      max: z.number().finite().positive(),
+      unit: timelineUnitSchema,
+    })
+    .refine((phase) => phase.min < phase.max, {
+      message: 'min must be less than max',
+      path: ['max'],
+    }),
+  z.strictObject({
     label: nonBlankStringSchema,
-    min: z.number().finite().nonnegative(),
-    max: z.number().finite().positive(),
-    unit: timelineUnitSchema,
-  })
-  .refine((phase) => phase.min < phase.max, {
-    message: 'min must be less than max',
-    path: ['max'],
-  });
+    kind: timelinePhaseKindSchema,
+    availability: z.literal('unknown'),
+    detail: nonBlankStringSchema,
+  }),
+]);
 export const timelineSchema = z.strictObject({
   id: timelineIdSchema,
   route: routeSchema,
@@ -361,9 +506,33 @@ export const effectGroupSchema = z
   .strictObject({
     id: effectsGroupIdSchema,
     items: z.array(nonBlankStringSchema).min(1),
+    qualifiers: z
+      .array(
+        z.strictObject({
+          itemIndex: z.number().int().nonnegative(),
+          qualifier: nonBlankStringSchema,
+          context: nonBlankStringSchema.optional(),
+          sourceReferences: sourceReferencesSchema,
+          evidence: evidenceMetadataSchema.optional(),
+        }),
+      )
+      .min(1)
+      .optional(),
     ...optionalEvidenceSchemaFields,
   })
-  .superRefine(requireSourcesForEvidence);
+  .superRefine(requireSourcesForEvidence)
+  .superRefine((group, context) => {
+    const seen = new Set<number>();
+    group.qualifiers?.forEach((qualifier, index) => {
+      if (qualifier.itemIndex >= group.items.length || seen.has(qualifier.itemIndex))
+        context.addIssue({
+          code: 'custom',
+          message: 'qualifier must reference a unique existing item',
+          path: ['qualifiers', index],
+        });
+      seen.add(qualifier.itemIndex);
+    });
+  });
 export const effectsSchema = z
   .strictObject({
     common: effectGroupSchema.optional(),
@@ -390,6 +559,7 @@ export const helpSignSchema = z
   .strictObject({
     id: helpSignIdSchema,
     body: nonBlankStringSchema,
+    action: z.literal('open_emergency'),
     ...optionalEvidenceSchemaFields,
   })
   .superRefine(requireSourcesForEvidence);
@@ -399,6 +569,7 @@ export const relationshipSchema = z
   .strictObject({
     id: relationshipIdSchema,
     substanceId: substanceIdSchema,
+    type: z.enum(['context', 'may_be_misrepresented_as', 'same_family']),
     reason: nonBlankStringSchema,
     ...optionalEvidenceSchemaFields,
   })
@@ -430,13 +601,18 @@ export const substanceSchema = z.strictObject({
   aliases: z.array(aliasSchema),
   searchTerms: z.array(nonBlankStringSchema),
   categoryIds: z.array(categoryIdSchema).min(1),
-  visual: z.strictObject({
-    symbol: nonBlankStringSchema,
-    color: contentColorSchema,
-  }),
+  subgroupIds: z.array(subgroupIdSchema).optional(),
+  tagIds: z.array(tagIdSchema).optional(),
+  visual: z
+    .strictObject({
+      symbol: nonBlankStringSchema,
+      color: contentColorSchema,
+    })
+    .optional(),
   identity: nonBlankStringSchema,
   review: reviewSchema,
   safetyClaims: z.array(safetyClaimSchema).min(1),
+  harmReductionActions: z.array(harmReductionActionSchema).min(1),
   doseReferences: z.array(doseReferenceSchema).min(1).optional(),
   timelines: z.array(timelineSchema).min(1).optional(),
   effects: effectsSchema.optional(),
@@ -451,6 +627,7 @@ export type Substance = z.infer<typeof substanceSchema>;
 export const emergencyContentSchema = z.strictObject({
   id: emergencyIdSchema,
   review: reviewSchema,
+  evidence: evidenceMetadataSchema.optional(),
   expected: z.array(nonBlankStringSchema).min(1),
   payAttention: z.array(nonBlankStringSchema).min(1),
   getHelp: z.array(nonBlankStringSchema).min(1),
@@ -461,6 +638,8 @@ export type EmergencyContent = z.infer<typeof emergencyContentSchema>;
 
 export const authoredContentSchema = z.strictObject({
   categories: z.array(categorySchema).min(1),
+  subgroups: z.array(subgroupSchema).optional(),
+  tags: z.array(tagSchema).optional(),
   sources: z.array(sourceSchema).min(1),
   emergency: emergencyContentSchema,
   substances: z.array(substanceSchema).min(1),
@@ -468,6 +647,9 @@ export const authoredContentSchema = z.strictObject({
 export type AuthoredContent = z.infer<typeof authoredContentSchema>;
 
 export interface ContentRepository {
+  listCategories(): readonly Category[];
+  listSubgroups(): readonly Subgroup[];
+  listTags(): readonly Tag[];
   listSubstances(): readonly Substance[];
   getSubstance(id: SubstanceId): Substance | undefined;
   listSources(): readonly Source[];
@@ -476,7 +658,7 @@ export interface ContentRepository {
 
 export const recentEntrySchema = z.strictObject({
   substanceId: substanceIdSchema,
-  viewedAt: z.number().finite(),
+  viewedAt: z.number().finite().nonnegative(),
 });
 export type RecentEntry = z.infer<typeof recentEntrySchema>;
 
